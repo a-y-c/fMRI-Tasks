@@ -126,6 +126,7 @@ Params.Time.ResponseMax = 1;
 
 % Rectangle Information
 Params.Rectangle.Color.blue = [ 0 0 255 ];
+Params.Rectangle.Color.red = [ 255 0 0 ];
 Params.Rectangle.Color.green = [ 0 128 0 ];
 Params.Rectangle.Color.white = [ 255 255 255 ];
 Params.Rectangle.Color.black = [ 0 0 0 ];

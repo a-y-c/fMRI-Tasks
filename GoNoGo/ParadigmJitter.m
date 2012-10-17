@@ -122,7 +122,7 @@ for i = 1:Params.TotalTrials
             Orient = 'vertical';
         % Vertical No Go
         case 2
-            color = 'blue';
+            color = 'red';
             VC = VC+1;
             TimeIndex = VC;
             Orient = 'vertical';
@@ -134,7 +134,7 @@ for i = 1:Params.TotalTrials
             Orient = 'horizontal';
         % Horizontal No Go
         case 4
-            color = 'blue';
+            color = 'red';
             HC = HC+1;
             TimeIndex = HC;
             Orient = 'horizontal';
@@ -167,7 +167,7 @@ for i = 1:Params.TotalTrials
     % Record TrialNumber
     Result.TrialNumber(i) = i;
     % Record Response
-    if strcmp(color, 'blue')
+    if strcmp(color, 'red')
         % Correct Response [ Blue/No -> No Response ]
         if VAT.KeyCodes(j-1) == -1 
             Result.Response(i) = 1;
@@ -245,8 +245,8 @@ end
 function [ VAT, j ] = DrawRectangle(WSS, VAT, j, ...
         Orient, SCenter, Color, Info ) 
     switch Color
-        case 'blue'
-            RectColor = Info.Color.blue;
+        case 'red'
+            RectColor = Info.Color.red;
         case 'green'
             RectColor = Info.Color.green;
         case 'white'

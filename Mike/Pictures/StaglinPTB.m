@@ -5,8 +5,6 @@ function StaglinPTB(TestSubject)
 % Program is Design for Simple 3Picture/Rest Application
 %
 %
-%
-%
 % 2012/02/07
 % This program was written for for Dr Bookhiemers Lab 
 % group on on Pyschtoolbox 3 on 2012/02/07. This was designed to be 
@@ -27,7 +25,10 @@ function StaglinPTB(TestSubject)
 %******************************************************************
 %
 % Dependencies:
-%   Paramters.m
+%   Setup.m             -Ask Name/Subject
+%   Paramters.m         -Sets Parameters of Experiment
+%   Task_data.mat       -Data Information
+%   Paradigm.m          -Runs the Experiment
 %
 %******************************************************************
 
@@ -35,52 +36,29 @@ function StaglinPTB(TestSubject)
 %%%%%%%%%
 % SETUP %
 %%%%%%%%%
+% Run Setup, Add into Params Struct
+TrialParams = Setup;
+Params = [ Params, TrialParams ];
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% GET INPUT DEVICE INFORMATION %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Input device for subject
-[PARAMS.HID_subject PARAMS.HID_subject_descrip] = hid_probe('subject');
+% Run Parameters, Add into Params Struct
+TrialParams = Parameters;
+Params = [ Params, TrialParams ];
 
-% Input device for researcher
-[PARAMS.HID_researcher PARAMS.HID_researcher_descrip] = hid_probe('researcher');
+ %% Establish Output Files
+Params.LogDir = 'LOG'
+Params.Filename  = [ Params.LogDir, '/', Params.ExperimentName, '_', ... 
+             datestr(now,'yyyymmdd_HHMMSS'), '_Subject_', Params.Subject.Name];
+% Backup Folders
+Params.Data_DIR = ''; 
+Params.Backup_Data_DIR = ''; 
 
 
-
-
-
-%% Who is the Subject ?
-if nargin < 1
-  TestSubject = input('Who is the Test Subject? Ex: JD ==> ', 's');
-end
-
-%% Test Mode?
-if isempty(TestSubject)
-    TestMode = 1;
-    disp('***** Test mode enabled. No data saving. *****')   
-else
-    TestMode = 0;
-end
-
-%% Load in Paramters
-Params = Parameters(TestMode, TestSubject);
-
-% Store Result to be Exported
-Result.TrialNumber     = [];   % Trial Counter
-Result.Response        = [];   % Response: 1 = Correct, 0 = Incorrect
-Result.CueType         = [];   % 1 = Vertical, 2 = Horizontal Rectangle
-Result.StimulusType    = [];   % 1 = VG, 2 = VB, 3 = HG, 4 = HB
-Result.Latency         = [];   % Length of Response
-Result.Time_Cue_Onset  = [];   % Time from Fixation Point to Cue
-Result.Time_Stim_Onset = [];   % Time from Cue to Stimulus
-Result.Time_to_Fix     = [];   % Time from Stimulus to Fixation
 
 % Store the Variables for all trials (VAT) 
 VAT.TimeStamps      = [];
 VAT.TScode          = [];
 VAT.KeyCode         = [];
 VAT.Results         = [];
-
 
 %% Activate Keyboard
 KbName('UnifyKeyNames');
@@ -118,10 +96,10 @@ BB4 = KbName('4');    % Button Box 4 (Red Key)
 
 %% Initialize the random stream
 RandStream.setDefaultStream(...
-                    RandStream('mt19937ar','seed',sum(100*clock)));
+    RandStream('mt19937ar','seed',sum(100*clock)));
 
 
-%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%
 %% Open Screens %
 %%%%%%%%%%%%%%%%%
 [ScreenHandels, Screen_Parameters, PPD_DPP] = ...
@@ -140,8 +118,6 @@ Params.PPD_DPP = PPD_DPP;
 %%%%%%%%%%%%%%%%%%%%
 % START EXPERIMENT %
 %%%%%%%%%%%%%%%%%%%%
-%Instructions
-Intro(ScreenHandels)
 
 %% Wait for the Scan to begin
 Text = 'Waiting for MRI scan to begin...';
@@ -169,11 +145,13 @@ olddisabledkeys = DisableKeysForKbCheck([KbName('T'),KbName('5')]);
 %% Run Experiment %
 %%%%%%%%%%%%%%%%%%%
 try % Start Try - Catch
-    disp('JITTER DESIGN')
+    disp('Starting Experiment')
         
+    % Running Experiment
     TrialVariables = ...
-       ParadigmJitter(0, Params, ScreenHandels);
+       Paradigm(0, Params, ScreenHandels);
     
+    % Saving Data (Appending to Variables)
     VAT.TimeStamps = ...
         [VAT.TimeStamps, TrialVariables.TimeStamps];
     VAT.TScode = ...

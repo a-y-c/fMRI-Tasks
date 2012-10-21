@@ -32,44 +32,77 @@ ImageDir = 'Perception';
 % DATA 
 %%%%%%%%%%%
 %Task Blocks
-Task{1}.CBlocks = 4;
-Task{1}.PBlocks = 4;
-Task{2}.CBlocks = 0;
-Task{2}.PBlocks = 6;
-Task{3}.CBlocks = 4;
-Task{3}.PBlocks = 4;
-Task{4}.CBlocks = 4;
-Task{4}.PBlocks = 4;
+Task{1}.CBlocksTotal = 4;
+Task{1}.CBlocks = [ 1 2 3 4 ];
+Task{1}.PBlocksTotal = 4;
+Task{1}.PBlocks = [ 5 6 7 8 ];
+
+Task{2}.CBlocksTotal = 0;
+Task{2}.CBlocks = [ ];
+Task{2}.PBlocksTotal = 4;
+Task{2}.PBlocks = [ 1 3 4 6 ];
+
+Task{3}.CBlocksTotal = 4;
+Task{3}.CBlocks = [ 1 2 3 4 ];
+Task{3}.PBlocksTotal = 4;
+Task{3}.PBlocks = [ 5 6 7 8 ];
+
+Task{4}.CBlocksTotal = 4;
+Task{4}.CBlocks = [ 1 2 3 4 ];
+Task{4}.PBlocksTotal = 4;
+Task{4}.PBlocks = [ 5 6 7 8 ];
 
 %Timing for Task
+%% Timing for Task1
 Task{1}.Timing.AudioComp = 2;
 Task{1}.Timing.ResponseComp = 3;
 Task{1}.Timing.InstrComp = 11;
+Task{1}.Timing.InstrCompBreak = 4;
+
 Task{1}.Timing.AudioPro = 2.5;
 Task{1}.Timing.ResponsePro = 2.5;
 Task{1}.Timing.InstrPro = 10;
-Task{1}.Timing.Break = 1;
+Task{1}.Timing.InstrProBreak = 5;
 
+Task{1}.Timing.StimBreak = 1;
+Task{1}.Timing.BlockBreak = 20;
+
+% Timing for Task2
 Task{2}.Timing.AudioPro = 1.75;
 Task{2}.Timing.ResponsePro = 2.25;
 Task{2}.Timing.InstrPro = 10;
-Task{2}.Timing.Break = 1;
+Task{2}.Timing.InstrProBreak = 5;
 
+Task{2}.Timing.StimBreak = 1;
+Task{2}.Timing.BlockBreak = 20;
+
+% Timing for Task3
 Task{3}.Timing.AudioComp = 2.5;
 Task{3}.Timing.ResponseComp = 2.5;
 Task{3}.Timing.InstrComp = 11;
+Task{3}.Timing.InstrCompBreak = 4;
+
 Task{3}.Timing.AudioPro = 5;
 Task{3}.Timing.ResponsePro = 5;
 Task{3}.Timing.InstrPro = 10;
-Task{3}.Timing.Break = 1;
+Task{3}.Timing.InstrProBreak = 5;
 
+Task{3}.Timing.StimBreak = 1;
+Task{3}.Timing.BlockBreak = 20;
+
+% Timing for Task4
 Task{4}.Timing.AudioComp = 1.75;
 Task{4}.Timing.ResponseComp = 2.25;
 Task{4}.Timing.InstrComp = 11;
+Task{4}.Timing.InstrCompBreak = 4;
+
 Task{4}.Timing.AudioPro = 3;
 Task{4}.Timing.ResponsePro = 2;
 Task{4}.Timing.InstrPro = 10;
-Task{4}.Timing.Break = 1;
+Task{4}.Timing.InstrProBreak = 5;
+
+Task{4}.Timing.StimBreak = 1;
+Task{4}.Timing.BlockBreak = 20;
 
 Intro.Timing.Break = 1;
 Intro.Timing.Response = 4;
@@ -103,7 +136,7 @@ Intro.Block{1}.Instr.Sentence = 'You are going to see two pictures: one on your 
 % Loop Through Task
 for T = 1:4
     % Loop Through Block
-    for B = 1:Task{T}.CBlocks+Task{T}.PBlocks
+    for B = [ Task{T}.CBlocks, Task{T}.PBlocks ]
     
     	% Load Images
     	TaskImageDir = [ ImageDir , '/T' , num2str(T), '/P' ];

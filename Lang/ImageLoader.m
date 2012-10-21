@@ -34,6 +34,9 @@ function [Images, ImageNames, ImageSize] = ImageLoader(folder,  TaskNumber, Bloc
 %******************************************************************
 
 WB = 0;
+Images = {};
+ImageNames = {};
+ImageSize = {};
 
 %% Figure out all the files in the folder
 if ( Block == 0 ) 

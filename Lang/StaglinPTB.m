@@ -35,12 +35,6 @@ function StaglinPTB(TestSubject)
 %%%%%%%%%
 % SETUP %
 %%%%%%%%%
-%% TEST MODE ?
-TestMode = 0;
-if TestMode == 1
-  disp('***** Test mode enabled. No data saving. *****')
-end
-
 %% Who is the Subject ?
 if nargin < 1
   TestSubject = input('Who is the Test Subject? Ex: JD ==> ', 's');
@@ -49,6 +43,8 @@ end
 if isempty(TestSubject)
     TestMode = 1;
     disp('***** Test mode enabled. No data saving. *****')   
+else
+    TestMode = 0;
 end
 
 %% Set up the program
@@ -78,12 +74,10 @@ end
 
 %% Unpack The Param Struct to save on typing
 %NumberOfBlocks = Task.TotalBlocks;
-CBlocks = Task.CBlocks;
-PBlocks = Task.PBlocks;
 if (BlockChoice == 'C')
-    LBlocks = 1:CBlocks;
+    LBlocks = Task.CBlocks;
 else
-    LBlocks = CBlocks+1:CBlocks+PBlocks;
+    LBlocks = Task.PBlocks;
 end
 
 
@@ -154,7 +148,7 @@ Params.PPD_DPP = PPD_DPP;
 %%%%%%%%%%%%%%%%%%%%
 %% Start Intro
 if ( TaskNumber == 1 && BlockChoice == 'C')
-    IntroParadigm(1, Params, ScreenHandels, Intro);
+    %IntroParadigm(1, Params, ScreenHandels, Intro);
 end
 
 
@@ -194,12 +188,6 @@ try % Start Try - Catch
             %NumberOfBlocks = 1;
             %for i = 5:9
             for i = LBlocks
-                Screen('FillRect', WSS, 128, RSS);
-                Screen('DrawDots', WSS, [0, 0], 10, ...
-                        255*[1 0 0 1], [RSS(3)/2 RSS(4)/2], 1);
-                Screen('DrawingFinished', WSS); 
-                Screen('Flip',WSS);
-                WaitSecs(Task.Timing.Break);
                 
                 
                 %%%%%%%%%%%%%%%%%%%%%
@@ -219,6 +207,14 @@ try % Start Try - Catch
                         TrialVariables = ...
                             Task4Paradigm(i, Params, ScreenHandels, Task);
                 end
+
+                % Block Break
+                Screen('FillRect', WSS, 128, RSS);
+                Screen('DrawDots', WSS, [0, 0], 10, ...
+                        255*[1 0 0 1], [RSS(3)/2 RSS(4)/2], 1);
+                Screen('DrawingFinished', WSS); 
+                Screen('Flip',WSS);
+                WaitSecs(Task.Timing.BlockBreak);
             
                 VAT.TimeStamps = ...
                     [VAT.TimeStamps, TrialVariables.TimeStamps];
@@ -309,10 +305,8 @@ catch lasterr
     
     % Save what you can
     if TestMode == 0    
-        save([Params.Data_DIR,'CrashSave_',Params.Filename,'.mat'],...
-             'Params', 'VAT', 'lasterr');
-        save([Params.Backup_Data_DIR,'CrashSave_',Params.Filename,'.mat'], ...
-             'Params', 'VAT', 'lasterr');      
+        save([Params.Filename,'CRASH.mat'],...
+             'Params', 'VAT', 'lasterr');    
     end
     
     

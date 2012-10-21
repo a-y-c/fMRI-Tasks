@@ -123,11 +123,21 @@ Params.TScodeIDTable = {...
 %%%%%%%%%%
 
 %% Establish Output Files
+Params.Data_DIR = 'LOG';
+Params.Backup_Data_DIR = '';
 
-Params.Filename  = [ Params.ExperimentName, '_', ...
+% Check if Log Directory Exist
+dircheck = exist(Params.Data_DIR);
+if dircheck ~= 7
+    Params.LogFile = '';
+end
+
+Params.Filename  = [ Params.Data_DIR, '/', ...
+            Params.ExperimentName, '_', ...
             datestr(now,'yyyymmdd_HHMMSS'), 'Task', ...
             num2str(TaskNumber), ...
             BlockChoice, '_Subject_', TestSubject];
+
 
 switch Params.LabGroup
     case 'MSCOHEN'
@@ -147,5 +157,3 @@ switch Params.LabGroup
             backup_data_folder = ' ';
         end    
 end         
-Params.Data_DIR = data_folder;
-Params.Backup_Data_DIR = backup_data_folder; 

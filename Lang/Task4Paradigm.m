@@ -121,6 +121,12 @@ switch BlockNumber
 
         %% Display Instructions only if First Block
         if ( BlockNumber == 1 )
+            % Transition Slides
+            [TimeStamps, TimeCodes, KeyCodes, j] = ...
+                DrawFixationPt(WSS, RSS, TimeStamps, ...
+                        TimeCodes, KeyCodes, j);
+            WaitSecs(Time.InstrCompBreak);
+
             DisplayText = Task.Instr.Comp
             [TimeStamps, TimeCodes, KeyCodes, j] = ... 
                 DrawText(WSS, DisplayText, TimeStamps, ... 
@@ -138,11 +144,6 @@ switch BlockNumber
             % Close Sound Buffer
             PsychPortAudio('Stop', Handel); 
 
-            % Transition Slides
-            [TimeStamps, TimeCodes, KeyCodes, j] = ...
-                DrawFixationPt(WSS, RSS, TimeStamps, ...
-                        TimeCodes, KeyCodes, j);
-            WaitSecs(Time.Break);
         end
         
         %% Draw the Textures
@@ -173,7 +174,7 @@ switch BlockNumber
                 [TimeStamps, TimeCodes, KeyCodes, j] = ...
                     DrawFixationPt(WSS, RSS, TimeStamps, ...
                                    TimeCodes, KeyCodes, j);
-                WaitSecs(Time.Break); % Wait time in Seconds
+                WaitSecs(Time.StimBreak); % Wait time in Seconds
             end
             % Finish One Stimilus
         end
@@ -188,6 +189,12 @@ switch BlockNumber
         
         %% Display Instructions only if First Block
         if ( BlockNumber == 5 )
+            % Transition Slides
+            [TimeStamps, TimeCodes, KeyCodes, j] = ...
+                DrawFixationPt(WSS, RSS, TimeStamps, ...
+                        TimeCodes, KeyCodes, j);
+            WaitSecs(Time.InstrProBreak);
+
             DisplayText = Task.Instr.Pro
             [TimeStamps, TimeCodes, KeyCodes, j] = ... 
                 DrawText(WSS, DisplayText, TimeStamps, ... 
@@ -201,15 +208,10 @@ switch BlockNumber
                     InstrFreq);
 
             % Wait X Seconds 
-            WaitSecs(Time.InstrComp);
+            WaitSecs(Time.InstrPro);
             % Close Sound Buffer
             PsychPortAudio('Stop', Handel); 
 
-            % Transition Slides
-            [TimeStamps, TimeCodes, KeyCodes, j] = ...
-                DrawFixationPt(WSS, RSS, TimeStamps, ...
-                        TimeCodes, KeyCodes, j);
-            WaitSecs(Time.Break);
         end
 
         %% Draw the Textures  
@@ -245,10 +247,11 @@ switch BlockNumber
                 [TimeStamps, TimeCodes, KeyCodes, j] = ...
                     DrawFixationPt(WSS, RSS, TimeStamps, ...
                                    TimeCodes, KeyCodes, j);
-            end
 
             % Finish/Close
-           	WaitSecs(Time.Break); % Wait time in Seconds
+           	WaitSecs(Time.StimBreak); % Wait time in Seconds
+            end
+
         end
         Screen('Close', TI); % Close the Open Textures
         PsychPortAudio('Close', Handel); 

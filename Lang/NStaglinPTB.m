@@ -35,12 +35,6 @@ function StaglinPTB(TestSubject)
 %%%%%%%%%
 % SETUP %
 %%%%%%%%%
-%% TEST MODE ?
-TestMode = 0;
-if TestMode == 1
-  disp('***** Test mode enabled. No data saving. *****')
-end
-
 %% Who is the Subject ?
 if nargin < 1
   TestSubject = input('Who is the Test Subject? Ex: JD ==> ', 's');
@@ -51,20 +45,6 @@ if isempty(TestSubject)
     disp('***** Test mode enabled. No data saving. *****')   
 end
 
-%% Set up the program
-TaskNumber = input('What Task Number do you want to do? [1-4]  ==> ');
-
-if ~isnumeric(TaskNumber) || TaskNumber > 4 || TaskNumber < 1 
-	eval error('Not within Range, Exiting')
-end
-
-%% Product or Comprehension
-BlockChoice = input('Comprehension or Production? [C or P] ==> ', 's');
-
-if ~(BlockChoice == 'P' || BlockChoice == 'C' || BlockChoice == 'p' || ...
-        BlockChoice == 'c')
-    eval error('Need C or P')
-end
 BlockChoice = upper(BlockChoice);
 
 Params = Parameters(TestMode, TestSubject, TaskNumber, BlockChoice);
@@ -329,3 +309,24 @@ end % End Try - Catch
     ShowCursor;
     clear all;
 end % All Done, That's All He Wrote
+
+
+function [ TaskNumber BlockChoice ] = PromptForDirection
+
+%% Set up the program
+TaskNumber = input('What Task Number do you want to do? [1-4]  ==> ');
+        
+    if ~isnumeric(TaskNumber) || TaskNumber > 4 || TaskNumber < 1 
+    	eval error('Not within Range, Exiting')
+    end
+    
+    %% Product or Comprehension
+    BlockChoice = input('Comprehension or Production? [C or P] ==> ', 's');
+    
+    if ~(BlockChoice == 'P' || BlockChoice == 'C' || BlockChoice == 'p' || ...
+            BlockChoice == 'c')
+        eval error('Need C or P')
+    end
+    BlockChoice = upper(BlockChoice);
+
+end

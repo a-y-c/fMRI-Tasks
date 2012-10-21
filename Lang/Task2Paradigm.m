@@ -116,11 +116,18 @@ end
 
 switch BlockNumber
     %  Object vs Subject Production
-    case { 1, 2, 3, 4 , 5, 6}
+    case { 1, 2, 3, 4}
         j = 2;% Set inital point for counter
         
         %% Display Instructions only if First Block
         if ( BlockNumber == 1 ) 
+            % Transition Slides
+            [TimeStamps, TimeCodes, KeyCodes, j] = ... 
+                DrawFixationPt(WSS, RSS, TimeStamps, ...
+                        TimeCodes, KeyCodes, j);
+            WaitSecs(Time.InstrProBreak);
+
+            % Display Text
             DisplayText = Task.Instr.Pro
             [TimeStamps, TimeCodes, KeyCodes, j] = ... 
                 DrawText(WSS, DisplayText, TimeStamps, ... 
@@ -138,11 +145,6 @@ switch BlockNumber
             % Close Sound Buffer
             PsychPortAudio('Stop', Handel); 
 
-            % Transition Slides
-            [TimeStamps, TimeCodes, KeyCodes, j] = ... 
-                DrawFixationPt(WSS, RSS, TimeStamps, ...
-                        TimeCodes, KeyCodes, j);
-            WaitSecs(Time.Break);
         end
    
         %% Draw the Textures
@@ -167,7 +169,7 @@ switch BlockNumber
                                    TimeCodes, KeyCodes, j);
 
                 % Finish/Close
-                WaitSecs(Time.Break); % Wait time in Seconds
+                WaitSecs(Time.StimBreak); % Wait time in Seconds
                 %i = i+1;
                 
             end

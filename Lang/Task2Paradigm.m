@@ -245,12 +245,22 @@ SourceDImage = [0 0 ImageSize(2) ImageSize(1)];
 % CHANGE MAX SIZE HERE %
 %%%%%%%%%%%%%%%%%%%%%%%%
 % Set Image Max Size
-Y = SCenter(2) * 3/2;
-X = SCenter(1) * 3/2;
-if X < Y
-    X = Y;
-else
+%Y = SCenter(2) * 3/2
+%X = SCenter(1) * 3/2
+%
+%if X < Y
+%    X = Y;
+%else
+%    Y = X;
+%end
+
+RATIO = 1/16;
+if ScreenSize(1) < ScreenSize(2)
+    X = (ScreenSize(1) - ScreenSize(1)*RATIO);
     Y = X;
+else
+    Y = (ScreenSize(2) - ScreenSize(2)*RATIO);
+    X = Y;
 end
 
 % Calculate Resizing 

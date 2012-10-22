@@ -148,7 +148,7 @@ Params.PPD_DPP = PPD_DPP;
 %%%%%%%%%%%%%%%%%%%%
 %% Start Intro
 if ( TaskNumber == 1 && BlockChoice == 'C')
-    %IntroParadigm(1, Params, ScreenHandels, Intro);
+    IntroParadigm(1, Params, ScreenHandels, Intro);
 end
 
 

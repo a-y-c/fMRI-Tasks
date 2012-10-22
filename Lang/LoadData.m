@@ -65,7 +65,7 @@ Task{1}.Timing.InstrPro = 10;
 Task{1}.Timing.InstrProBreak = 5;
 
 Task{1}.Timing.StimBreak = 1;
-Task{1}.Timing.BlockBreak = 2;
+Task{1}.Timing.BlockBreak = 20;
 
 % Timing for Task2
 Task{2}.Timing.AudioPro = 1.75;
@@ -74,7 +74,7 @@ Task{2}.Timing.InstrPro = 10;
 Task{2}.Timing.InstrProBreak = 5;
 
 Task{2}.Timing.StimBreak = 1;
-Task{2}.Timing.BlockBreak = 2;
+Task{2}.Timing.BlockBreak = 20;
 
 % Timing for Task3
 Task{3}.Timing.AudioComp = 2.5;
@@ -88,7 +88,7 @@ Task{3}.Timing.InstrPro = 10;
 Task{3}.Timing.InstrProBreak = 5;
 
 Task{3}.Timing.StimBreak = 1;
-Task{3}.Timing.BlockBreak = 2;
+Task{3}.Timing.BlockBreak = 20;
 
 % Timing for Task4
 Task{4}.Timing.AudioComp = 1.75;
@@ -102,7 +102,7 @@ Task{4}.Timing.InstrPro = 10;
 Task{4}.Timing.InstrProBreak = 5;
 
 Task{4}.Timing.StimBreak = 1;
-Task{4}.Timing.BlockBreak = 2;
+Task{4}.Timing.BlockBreak = 20;
 
 Intro.Timing.Break = 1;
 Intro.Timing.Response = 4;

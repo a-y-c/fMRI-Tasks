@@ -44,7 +44,7 @@ counter = 0;
 for i=1:size(Files,1)
     
     % load only if the file is a supported wav format
-    [pathstr, name, ext, versn] = fileparts(Files(i).name);
+    [pathstr, name, ext] = fileparts(Files(i).name);
    
     if (strcmpi(ext, '.wav') == 1)
 

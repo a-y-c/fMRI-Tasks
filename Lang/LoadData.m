@@ -65,7 +65,7 @@ Task{1}.Timing.InstrPro = 10;
 Task{1}.Timing.InstrProBreak = 5;
 
 Task{1}.Timing.StimBreak = 1;
-Task{1}.Timing.BlockBreak = 20;
+Task{1}.Timing.BlockBreak = 2;
 
 % Timing for Task2
 Task{2}.Timing.AudioPro = 1.75;
@@ -74,7 +74,7 @@ Task{2}.Timing.InstrPro = 10;
 Task{2}.Timing.InstrProBreak = 5;
 
 Task{2}.Timing.StimBreak = 1;
-Task{2}.Timing.BlockBreak = 20;
+Task{2}.Timing.BlockBreak = 2;
 
 % Timing for Task3
 Task{3}.Timing.AudioComp = 2.5;

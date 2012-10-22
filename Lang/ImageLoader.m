@@ -54,7 +54,7 @@ counter = 0;
 for i=1:size(Files,1)
     
     % load only if the file is a supported image format
-    [pathstr, name, ext, versn] = fileparts(Files(i).name);
+    [pathstr, name, ext ] = fileparts(Files(i).name);
    
     if ((strcmpi(ext, '.bmp') == 1) || ...
         (strcmpi(ext, '.cur') == 1) || ...

@@ -123,17 +123,16 @@ Params.TScodeIDTable = {...
 %%%%%%%%%%
 
 %% Establish Output Files
-Params.Data_DIR = 'LOG';
+Params.Data_DIR = 'LOG/';
 Params.Backup_Data_DIR = '';
 
 % Check if Log Directory Exist
 dircheck = exist(Params.Data_DIR);
 if dircheck ~= 7
-    Params.LogFile = '';
+    Params.Data_DIR = '';
 end
 
-Params.Filename  = [ Params.Data_DIR, '/', ...
-            Params.ExperimentName, '_', ...
+Params.Filename  = [ Params.ExperimentName, '_', ...
             datestr(now,'yyyymmdd_HHMMSS'), 'Task', ...
             num2str(TaskNumber), ...
             BlockChoice, '_Subject_', TestSubject];

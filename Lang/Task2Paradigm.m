@@ -116,7 +116,7 @@ end
 
 switch BlockNumber
     %  Object vs Subject Production
-    case { 1, 2, 3, 4}
+    case { 1, 2, 3, 4, 6}
         j = 2;% Set inital point for counter
         
         %% Display Instructions only if First Block
@@ -245,8 +245,8 @@ SourceDImage = [0 0 ImageSize(2) ImageSize(1)];
 % CHANGE MAX SIZE HERE %
 %%%%%%%%%%%%%%%%%%%%%%%%
 % Set Image Max Size
-X = SCenter(2) * 3/2;
-Y = SCenter(1) * 3/2;
+Y = SCenter(2) * 3/2;
+X = SCenter(1) * 3/2;
 if X < Y
     X = Y;
 else

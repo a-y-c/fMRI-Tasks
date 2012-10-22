@@ -188,7 +188,7 @@ try % Start Try - Catch
             %NumberOfBlocks = 1;
             %for i = 5:9
             for i = LBlocks
-                
+            disp(i)            
                 
                 %%%%%%%%%%%%%%%%%%%%%
                 % TEST Variable %%%%%

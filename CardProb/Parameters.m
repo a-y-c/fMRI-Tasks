@@ -83,8 +83,8 @@ switch Params.DesignType
         Params.ISIMin = 1; % Min Inter-Stimulus interval (sec)
 end
 
-Params.TotalRuns = 10;
-Params.TotalTrial = 12;
+Params.NumberofRuns = 10;
+Params.NumberofTrial = 12;
 Params.MoneyReward = '1.00';
 Params.MoneyPunish = '0.50';
 
@@ -95,3 +95,14 @@ Params.Timing.Outcome = 0.5;
 Params.Timing.Feedback = 0.5;
 Params.Timing.ITI2 = 11.5;
                           
+
+Params.TotalCue1 = 24;
+Params.TotalCue2 = 24;
+Params.TotalCue3 = 24;
+Params.TotalCue4 = 24;
+Params.TotalCue5 = 24;
+Params.TotalTrial = 120;
+
+Params.CardRatio = 5;
+Params.CardSize = 1/32;
+Params.CardBackground = [ 0 0 0 ]; 

@@ -74,6 +74,23 @@ VAT.TimeStamps(1) = GetSecs;
 VAT.TimeCodes(1) = 3; % Block Begin
 VAT.KeyCodes(1) = -1; % No Key Press
 
+%% Set Up 
+Params.TotalCue1 = 24;
+Params.TotalCue2 = 24;
+Params.TotalCue3 = 24;
+Params.TotalCue4 = 24;
+Params.TotalCue5 = 24;
+
+ONE = ones(1, Params.TotalCue1);
+TWO = repmat(2, 1, Params.TotalCue2);
+THREE = repmat(3, 1, Params.TotalCue3);
+FOUR = repmat(4, 1, Params.TotalCue4);
+FIVE = repmat(5, 1, Params.TotalCue5);
+
+% Presentation Order (Randomized)
+ix = randperm(Params.TotalTrials);
+UnorderedTrialSet = [ ONE, TWO, THREE, FOUR, FIVE ];
+Params.TrialSet = UnorderedTrialSet(ix);
 
 %%%%%%%%%%%%%%
 % EXPERIMENT %
@@ -82,16 +99,19 @@ VAT.KeyCodes(1) = -1; % No Key Press
 for i = 1:Task.TotalBlocks
     disp(i)
 
-    % Draw Image
-    [VAT, j] = DrawImage(WSS, Params.Image(3*i - 2), ...
-        Params.ImageSize(3*i - 2) ...
-        Params.ScreenSize, Params.PictureRatio, VAT, j );
-    WaitSecs(Params.Time.PictureLength);
+    % Draw Cue  
+    [VAT, j] = DrawCard(WSS, Params.ScreenSize, ...
+        Params.CardRatio, Params.CardSize, ...
+        CueText, Params.CardBackground, VAT, j );
 
-    % Draw Image
-    [VAT, j] = DrawImage(WSS, Params.Image(3*i - 1), ...
-        Params.ImageSize(3*i - 1) ...
-        Params.ScreenSize, Params.PictureRatio, VAT, j );
+    WaitSecs(Params.Timing.Cue);
+    WaitSecs(Params.Timing.ITI1);
+
+    % Draw Question Cue / FeedBack Period 
+    [VAT, j] = DrawCard(WSS, Params.ScreenSize, ...
+        Params.CardRatio, Params.CardSize, ...
+        CueText, Params.CardBackground, VAT, j );
+
     WaitSecs(Params.Time.PictureLength);
 
     % Draw Image
@@ -143,15 +163,26 @@ function [VAT, j] = DrawFixationPt(WSS, RSS, VAT, j)
 end
 
 % Draw / Display Text            
-function [VAT, j] = DrawImage(WSS, Image, ImageSize, ScreenSize, ...
-        Ratio, VAT, j)
+function [VAT, j] = DrawCard(WSS, ScreenSize, CardRatio, ...
+             CardSize, CueText, Color, VAT, j)
     
     % Calculate Location of Image
-    DestImage = Cize( ScreenSize(2), ScreenSize(1), ImageSize(2), ...
-        ImageSize(1), Ratio ); 
+    CardX1 = ScreenSize(1)/2 - ...
+        (ScreenSize(1)/2*CardSize) 
+    CardX2 = ScreenSize(1)/2 + ...
+        (ScreenSize(1)/2*CardSize) 
+    CardY1 = ScreenSize(2)/2 - ...
+        (ScreenSize(2)/2*CardRatio*CardSize) 
+    CardY1 = ScreenSize(2)/2 - ...
+        (ScreenSize(2)/2*CardRatio*CardSize) 
 
+    Dest = [ CardX1 CardX2 CardY1 CardY2 ]; 
+    
     % Display Image Screen
-    Screen('DrawTexture', WSS, Image, DestImage );
+    Screen('FillRect', WSS, Color, Dest);
+
+    % Display Text
+    DrawFormattedText(WSS, CueText, 'center', 'center', 0, 45);
     
     % Record Timing
     TimeStamps(j) = Screen('Flip',WSS);
@@ -160,28 +191,47 @@ function [VAT, j] = DrawImage(WSS, Image, ImageSize, ScreenSize, ...
     j = j+1; % Advance Counter
 end
 
-%% Help Calculate Frame Size
-function [ DestImage ] = Cize(RX, RY, X, Y, Ratio)
-    % Figure out Max Horizontal or Max Vertical of Screen
-    if (RX > RY)
-        MaxR = RX;
-    else
-        MaxR = RY;
+function [VAT, j, RT] = ...
+    GetKeyPressWithTimeOut(Keys, VAT, j, maxTime)
+
+    baseTime = GetSecs;
+    gotgood = false;
+    
+    while ~gotgood
+        % while no key is pressed, wait a bit, then check again
+        if( GetSecs-baseTime > maxTime )
+            secs = baseTime + maxTime;
+            RT = maxTime;
+            key = 'T'; % Capitalized
+            return;
+        end 
+        WaitSecs(0.001);
+    
+        % got here? a key is down! retrieve the key and RT
+        keyIsDown = 0;
+        [keyIsDown, secs, keyCode] = KbCheck(-1);
+        if keyIsDown == 1
+           if (keyCode(Keys.TRKey1) | ... 
+               keyCode(Keys.TRKey2) | ... 
+               keyCode(Keys.TRKB))
+               keyIsDown = 0;
+            else
+                gotgood = true;
+            end
+        end
     end
-    % Figure out Max Horizontal/Vertical of Picture
-    % Adjust for Size to be Displayed
-    if (X > Y)
-        YO = MaxR / X * Y * Ratio;
-        XO = MaxR * Ratio;
-    else
-        XO = MaxR / Y * X * Ratio;
-        YO = MaxR * Ratio;
+    RT = secs-baseTime;
+
+    % do not pass control back until the key has been released
+    while KbCheck(-1)
+        WaitSecs(0.001);
     end
-    % Adjust to Cener Image
-    X1 = RX/2 - (XO)/2;
-    Y1 = RY/2 - (YO)/2;
-    Y2 = RY/2 + (YO)/2;
-    X2 = RX/2 + (XO)/2;
-    DestImage = [ X1 Y1 X2 Y2 ] ;
+
+    TimeStamps(j) = secs;
+    %disp( KbName(keyCode));
+    %KeyCodes(j) = str(KbName(keyCode))); 
+    KeyCodes(j) = find(keyCode,1);
+    TimeCodes(j) = 8;
+    j = j+1; % Advance Counter
 end
 

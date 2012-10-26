@@ -99,7 +99,7 @@ Params.TrialSet = UnorderedTrialSet(ix);
 for i = 1:Task.TotalBlocks
     disp(i)
 
-    % Draw Cue  
+    % Draw Inital Cue  
     [VAT, j] = DrawCard(WSS, Params.ScreenSize, ...
         Params.CardRatio, Params.CardSize, ...
         CueText, Params.CardBackground, VAT, j );
@@ -107,17 +107,21 @@ for i = 1:Task.TotalBlocks
     WaitSecs(Params.Timing.Cue);
     WaitSecs(Params.Timing.ITI1);
 
-    % Draw Question Cue / FeedBack Period 
+    % Draw Question Cue 
     [VAT, j] = DrawCard(WSS, Params.ScreenSize, ...
         Params.CardRatio, Params.CardSize, ...
         CueText, Params.CardBackground, VAT, j );
 
-    WaitSecs(Params.Time.PictureLength);
+    % Wait for Response 
+    [VAT, j, RT] = DrawImage( Keys, VAT, j, Params.Timing.Guess);
+    WaitSecs(Params.Timing.Guess - RT);
 
-    % Draw Image
-    [VAT, j] = DrawImage(WSS, Params.Image(3*i), Params.ImageSize(3*i) ...
-        Params.ScreenSize, Params.PictureRatio, VAT, j );
-    WaitSecs(Params.Time.PictureLength);
+    % Draw OutCome Cue 
+    [VAT, j] = DrawCard(WSS, Params.ScreenSize, ...
+        Params.CardRatio, Params.CardSize, ...
+        CueText, Params.CardBackground, VAT, j );
+
+    WaitSecs(Params.Outcome);
 
     % Fixation Point
     [VAT, j] = DrawFixationPt(WSS, RSS, VAT, j); 
@@ -191,6 +195,8 @@ function [VAT, j] = DrawCard(WSS, ScreenSize, CardRatio, ...
     j = j+1; % Advance Counter
 end
 
+%function [ VAT, j ]  = DrawReward( 
+
 function [VAT, j, RT] = ...
     GetKeyPressWithTimeOut(Keys, VAT, j, maxTime)
 
@@ -227,11 +233,11 @@ function [VAT, j, RT] = ...
         WaitSecs(0.001);
     end
 
-    TimeStamps(j) = secs;
+    VAT.TimeStamps(j) = secs;
     %disp( KbName(keyCode));
     %KeyCodes(j) = str(KbName(keyCode))); 
-    KeyCodes(j) = find(keyCode,1);
-    TimeCodes(j) = 8;
+    VAT.KeyCodes(j) = find(keyCode,1);
+    VAT.TimeCodes(j) = 8;
     j = j+1; % Advance Counter
 end
 

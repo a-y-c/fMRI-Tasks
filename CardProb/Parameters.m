@@ -83,11 +83,14 @@ switch Params.DesignType
         Params.ISIMin = 1; % Min Inter-Stimulus interval (sec)
 end
 
+% Information
 Params.NumberofRuns = 10;
 Params.NumberofTrial = 12;
 Params.MoneyReward = '1.00';
 Params.MoneyPunish = '0.50';
+Params.StartingMoney = '10';
 
+% Timing
 Params.Timing.Cue = 1.5;
 Params.Timing.ITI1 = 10.5;
 Params.Timing.Guess = 2.5;
@@ -95,7 +98,7 @@ Params.Timing.Outcome = 0.5;
 Params.Timing.Feedback = 0.5;
 Params.Timing.ITI2 = 11.5;
                           
-
+% Cue Data
 Params.TotalCue1 = 24;
 Params.TotalCue2 = 24;
 Params.TotalCue3 = 24;
@@ -103,6 +106,21 @@ Params.TotalCue4 = 24;
 Params.TotalCue5 = 24;
 Params.TotalTrials = 120;
 
+Params.Cue1 = '@';
+Params.Cue1Weight = 100;
+Params.Cue2 = '#';
+Params.Cue2Weight = 0;
+Params.Cue3 = '%';
+Params.Cue3Weight = 66;
+Params.Cue4 = '&';
+Params.Cue4Weight = 33;
+Params.Cue5 = '^';
+Params.Cue5Weight = 50;
+
+Params.CueQuestion = '?';
+
+
+% Card Data
 Params.CardRatio = 5;
 Params.CardSize = 1/32;
 Params.CardBackground = [ 0 0 0 ]; 

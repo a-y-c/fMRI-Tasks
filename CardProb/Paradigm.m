@@ -108,6 +108,7 @@ for i = 1:Params.TrialSet
     WaitSecs(Params.Timing.Cue);
     WaitSecs(Params.Timing.ITI1);
 
+    CueText = Params.Cue
     % Draw Question Cue 
     [VAT, j] = DrawCard(WSS, Params.ScreenSize, ...
         Params.CardRatio, Params.CardSize, ...

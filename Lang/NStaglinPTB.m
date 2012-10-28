@@ -89,7 +89,7 @@ BB4 = KbName('4');    % Button Box 4 (Red Key)
 %% Open Screens %
 %%%%%%%%%%%%%%%%%
 [ScreenHandels, Screen_Parameters, PPD_DPP] = ...
-    Activate_Screens(Params.Constants, Params);
+    Activate_Screens;
 WES = ScreenHandels.WES; % Window Handel Right Screen
 RES = ScreenHandels.RES; % Window Rectangle Right Screen
 WSS = ScreenHandels.WSS; % Window Handel Left Screen
@@ -104,7 +104,7 @@ Params.PPD_DPP = PPD_DPP;
 %%%%%%%%%%%%%%%%%%%%
 % START EXPERIMENT %
 %%%%%%%%%%%%%%%%%%%%
-Escape = FALSE;
+Escape = false;
 while (~Escape)
 
     % Retrieve Scan Information from User Input
@@ -211,7 +211,8 @@ while (~Escape)
                 [VAT.KeyCode, TrialVariables.KeyCodes];
             VAT.PresentationOrder = ...
                [VAT.PresentationOrder, TrialVariables.POrder];
-
+        end
+        
 %%%%%%%%%%%%%       
 % SAVE DATA % 
 %%%%%%%%%%%%%
@@ -264,9 +265,9 @@ while (~Escape)
 end % End Escape Error
 end % All Done, That's All He Wrote
 
-function [ TaskNumber BlockChoice ] GetCommand = (WSS, RSS, SCenter) 
+function [ TaskNumber BlockChoice ] = GetCommand(WSS, RSS, SCenter) 
     %% Set up the program
-    Escape = FALSE;
+    Escape = false;
     while (~Escape)
         MSG = 'What Task Number do you want to do? [1-4] or [Q]  ==> ';
         TaskNumber = GetEchoString(WSS, MSG, SCenter(1), SCenter(2));
@@ -279,7 +280,7 @@ function [ TaskNumber BlockChoice ] GetCommand = (WSS, RSS, SCenter)
             return 
         end
     end 
-    Escape = FALSE;
+    Escape = false;
     while (~Escape)
         %% Product or Comprehension
         MSG = 'Comprehension or Production? [C or P or Q] ==> ';

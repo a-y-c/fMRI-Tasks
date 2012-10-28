@@ -37,15 +37,18 @@ function StaglinPTB(TestSubject)
 % SETUP %
 %%%%%%%%%
 % Run Setup, Add into Params Struct
-TrialParams = Setup;
-Params = [ Params, TrialParams ];
+Params = [];
+Params = Setup(Params);
 
 % Run Parameters, Add into Params Struct
-TrialParams = Parameters;
-Params = [ Params, TrialParams ];
+Params = Parameters(Params);
 
  %% Establish Output Files
 Params.LogDir = 'LOG'
+dircheck = exist(Params.LogDir);
+if dircheck ~= 7
+    Params.LogDir = '';
+end
 Params.Filename  = [ Params.LogDir, '/', Params.ExperimentName, '_', ... 
              datestr(now,'yyyymmdd_HHMMSS'), '_Subject_', Params.Subject.Name];
 % Backup Folders
@@ -207,7 +210,7 @@ catch lasterr
     Screen('CloseAll');
     
     % Save what you can
-    if TestMode == 0    
+    if Params.TestMode == 0    
         save([Params.Data_DIR,'CrashSave_',Params.Filename,'.mat'],...
              'Params', 'VAT', 'lasterr');
         save([Params.Backup_Data_DIR,'CrashSave_',Params.Filename,'.mat'], ...

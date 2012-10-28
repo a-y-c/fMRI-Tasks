@@ -1,4 +1,4 @@
-function [ Params ] = Parameters
+function [ Params ] = Parameters(Params)
 % % Setup.m *****************************************************
 %
 %   Description:
@@ -54,7 +54,7 @@ Params.Constants.PTBVersion = Screen('Version'); % Get The PTB Version
 
 Params.DrawFixationPt = 1; % 1 = On, 0 = Off
 Params.RTA = 0; %Real Time Analysis 1 = On, 0 = Off
-%Params.UseOneMonitor = 1; % Only use 1 monitor otherwise 
+Params.UseOneMonitor = 1; % Only use 1 monitor otherwise 
                           % use 2 if available and not in TestMode
 
 
@@ -63,8 +63,8 @@ Params.RTA = 0; %Real Time Analysis 1 = On, 0 = Off
 %%%%%%%%%%
 % Design Choice
 %% BLOCK OR JITTER
-Params.Design = 'Block'; 
-%Params.Design = 'Jitter';
+Params.DesignType = 'Block'; 
+%Params.DesignType = 'Jitter';
 
 switch Params.DesignType
     % Block

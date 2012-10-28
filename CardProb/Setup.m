@@ -1,4 +1,4 @@
-function [ Params ] = Setup
+function [ Params ] = Setup(Params)
 % % Setup.m *****************************************************
 %
 %   Description:
@@ -51,7 +51,7 @@ end
 
 % Input device for researcher
 [Params.Researcher.HID PARAMS.Researcher.HID_Descrip] = hid_probe('researcher');
-
+end
 
 %% Display Warning Message
 %%%% (NAR)

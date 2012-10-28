@@ -44,7 +44,8 @@ if IsOSX == 1
     ExperimenterScreenID = 0;
     rect=Screen('Rect', SubjectScreenID);
     if numel(AvailableScreens) == 1;
-        Srect = [rect(3)/2, rect(4)/2, rect(3), rect(4)];
+        %Srect = [rect(3)/2, rect(4)/2, rect(3), rect(4)];
+        Srect = rect;
         OnlyOneScreen = 1;
     else
         Srect = rect;
@@ -55,7 +56,8 @@ else
     ExperimenterScreenID = 1;
     rect=Screen('Rect', SubjectScreenID);
     if numel(AvailableScreens) == 2;
-        Srect = [rect(3)/2, rect(4)/2, rect(3), rect(4)];
+        %Srect = [rect(3)/2, rect(4)/2, rect(3), rect(4)];
+        Srect = rect;
         OnlyOneScreen = 1;
     else
         Srect = rect;
@@ -92,7 +94,7 @@ ifiS = Screen('GetFlipInterval', winSubjectScreen);
 % specify a global per-patch contrast value:
 
 % Declare the Text Size for the screen
-Screen('TextSize',winSubjectScreen, 48);
+Screen('TextSize',winSubjectScreen, 32);
 % Screen Width and Screen Height for the Left Screen Respectively
 [SWS, SHS] = RectSize(RectSubjectScreen); 
 

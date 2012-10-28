@@ -96,9 +96,10 @@ Params.TrialSet = UnorderedTrialSet(ix);
 % EXPERIMENT %
 %%%%%%%%%%%%%%
 % Loop Through Each Trial
-for i = 1:Task.TotalBlocks
+for i = 1:Params.TrialSet
     disp(i)
-
+    
+    CueText = Params.TrialSet(i);
     % Draw Inital Cue  
     [VAT, j] = DrawCard(WSS, Params.ScreenSize, ...
         Params.CardRatio, Params.CardSize, ...

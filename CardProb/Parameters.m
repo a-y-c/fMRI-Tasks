@@ -101,7 +101,7 @@ Params.TotalCue2 = 24;
 Params.TotalCue3 = 24;
 Params.TotalCue4 = 24;
 Params.TotalCue5 = 24;
-Params.TotalTrial = 120;
+Params.TotalTrials = 120;
 
 Params.CardRatio = 5;
 Params.CardSize = 1/32;

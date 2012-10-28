@@ -108,7 +108,7 @@ for i = 1:Params.TrialSet
     WaitSecs(Params.Timing.Cue);
     WaitSecs(Params.Timing.ITI1);
 
-    CueText = Params.Cue
+    CueText = Params.CueQuestion;
     % Draw Question Cue 
     [VAT, j] = DrawCard(WSS, Params.ScreenSize, ...
         Params.CardRatio, Params.CardSize, ...
@@ -179,10 +179,10 @@ function [VAT, j] = DrawCard(WSS, ScreenSize, CardRatio, ...
         (ScreenSize(1)/2*CardSize) 
     CardY1 = ScreenSize(2)/2 - ...
         (ScreenSize(2)/2*CardRatio*CardSize) 
-    CardY1 = ScreenSize(2)/2 - ...
+    CardY2 = ScreenSize(2)/2 + ...
         (ScreenSize(2)/2*CardRatio*CardSize) 
 
-    Dest = [ CardX1 CardX2 CardY1 CardY2 ]; 
+    Dest = [ CardX1 CardY1 CardX2 CardY2 ]; 
     
     % Display Image Screen
     Screen('FillRect', WSS, Color, Dest);

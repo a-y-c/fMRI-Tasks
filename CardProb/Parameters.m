@@ -121,6 +121,6 @@ Params.CueQuestion = '?';
 
 
 % Card Data
-Params.CardRatio = 5;
-Params.CardSize = 1/32;
+Params.CardRatio = 4;
+Params.CardSize = 1/24;
 Params.CardBackground = [ 0 0 0 ]; 

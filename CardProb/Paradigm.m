@@ -99,35 +99,57 @@ Params.TrialSet = UnorderedTrialSet(ix);
 for i = 1:Params.TrialSet
     disp(i)
     
-    CueText = Params.TrialSet(i);
+    CueText = Params.Cue{Params.TrialSet(i)};
+    CueWeight = Params.Cue{Params.TrialSet(i)};
+    [ CueNumber, Keys.Answer ] = CalcProb(Params.Card, CueWeight);
+
     % Draw Inital Cue  
     [VAT, j] = DrawCard(WSS, Params.ScreenSize, ...
-        Params.CardRatio, Params.CardSize, ...
-        CueText, Params.CardBackground, VAT, j );
-
+        Params.Card.Ratio, Params.Card.Size, ...
+        CueText, Params.Card.Background, VAT, j );
     WaitSecs(Params.Timing.Cue);
+
+    % Fixation Point
+    [VAT, j] = DrawFixationPt(WSS, RSS, VAT, j); 
     WaitSecs(Params.Timing.ITI1);
 
-    CueText = Params.CueQuestion;
     % Draw Question Cue 
+    CueText = Params.CueQuestion;
     [VAT, j] = DrawCard(WSS, Params.ScreenSize, ...
-        Params.CardRatio, Params.CardSize, ...
-        CueText, Params.CardBackground, VAT, j );
+        Params.Card.Ratio, Params.Card.Size, ...
+        CueText, Params.Card.Background, VAT, j );
 
     % Wait for Response 
-    [VAT, j, RT] = DrawImage( Keys, VAT, j, Params.Timing.Guess);
+    [VAT, j, RT] = GetKeyPresWithTimeOut( Keys, VAT, ...
+        j, Params.Timing.Guess);
     WaitSecs(Params.Timing.Guess - RT);
 
     % Draw OutCome Cue 
     [VAT, j] = DrawCard(WSS, Params.ScreenSize, ...
-        Params.CardRatio, Params.CardSize, ...
-        CueText, Params.CardBackground, VAT, j );
-
+        Params.Card.Ratio, Params.Card.Size, ...
+        CueNumber, Params.Card.Background, VAT, j );
     WaitSecs(Params.Outcome);
+
+    % Draw Reward/Punishment
+    [VAT, j] = DrawFeed(WSS, Params.ScreenSize, ...
+        Params.Feedback, VAT, j);
 
     % Fixation Point
     [VAT, j] = DrawFixationPt(WSS, RSS, VAT, j); 
-    WaitSecs(Params.Time.ISILength);
+    WaitSecs(Params.Time.ITI2);
+
+
+    %% Save Data
+    VAT.Results{i}.Cue = CueText;
+    VAT.Results{i}.CueWeight = CueWeight;
+    VAT.Results{i}.CueOnset = 
+    VAT.Results{i}.
+    VAT.Results{i}.
+    VAT.Results{i}.
+    VAT.Results{i}.
+    VAT.Results{i}.
+    VAT.Results{i}.
+    VAT.Results{i}.
 
 % End Loop 
 end
@@ -155,6 +177,8 @@ end
 % FUNCTIONS %
 %%%%%%%%%%%%%
 %% Draw Fixation Point
+    %IN -> Screen, Screen, LOG, COUNTER
+    %OUT -> LOG, COUNTER
 function [VAT, j] = DrawFixationPt(WSS, RSS, VAT, j)
     Screen('FillRect', WSS, 128, RSS);
     Screen('DrawDots', WSS, [0, 0], 10, 255*[1 0 0 1], ... 
@@ -169,6 +193,7 @@ function [VAT, j] = DrawFixationPt(WSS, RSS, VAT, j)
 end
 
 % Draw / Display Text            
+    %IN -> Screen, Card
 function [VAT, j] = DrawCard(WSS, ScreenSize, CardRatio, ...
              CardSize, CueText, Color, VAT, j)
     
@@ -197,8 +222,9 @@ function [VAT, j] = DrawCard(WSS, ScreenSize, CardRatio, ...
     j = j+1; % Advance Counter
 end
 
-%function [ VAT, j ]  = DrawReward( 
-
+%% Record Key Press
+    %IN -> Accept KEYS, LOG, Counter, MAx
+    %OUT -> Log, Counter, Response Time
 function [VAT, j, RT] = ...
     GetKeyPressWithTimeOut(Keys, VAT, j, maxTime)
 
@@ -235,6 +261,21 @@ function [VAT, j, RT] = ...
         WaitSecs(0.001);
     end
 
+    if Keys.Answer == 'high'
+        if (KbName(keyCode)) == Keys.KB1 |
+            KbName(keyCode)) == Keys.KB2 )
+            VAT.Answer = True;
+        else
+           VAT.Answer = FALSE; 
+        end
+    else
+        if (KbName(keyCode)) == Keys.KB3 |
+            KbName(keyCode)) == Keys.KB4 )
+            VAT.Answer = True;
+        else
+            VAT.Answer = False;
+    end
+
     VAT.TimeStamps(j) = secs;
     %disp( KbName(keyCode));
     %KeyCodes(j) = str(KbName(keyCode))); 
@@ -243,3 +284,47 @@ function [VAT, j, RT] = ...
     j = j+1; % Advance Counter
 end
 
+%% Calculate Probability of Card High Low
+    %IN -> Card Information (High Low), Weight
+    %OUT -> Range of either High Low
+function [CueNumber, Ans] = CalcProb(Card, Weight)
+    % Generate a Random Number between 1 - 100
+    randnum = randi([1,100]);
+    
+    % High
+    if Weight > randnum
+        randpos = randi([1, Card.HighLength]);
+        CueNumber = Card.High(randpos);
+        Ans = 'high'
+    % Low
+    else 
+        randpos = randi([1, Card.LowLength]);
+        CueNumber = Card.Low(randpos);
+        Ans = 'low'
+    end
+end
+
+%% Calculate/Draw Punishment Reward Feedback
+    %IN -> Screen, Screen, Feedback, Log, Counter
+    %OUT -> Log, Counter
+function [VAT, j] = DrawFeed(WSS, Params.ScreenSize, ...
+    Feedback, VAT, j )
+    
+    % Calculate in Money Format
+    format bank;
+    
+    XT1 = Params.ScreenSize(1) * Params.Feedback.PosH;
+    YT1 = Params.ScreenSize(2) / 2; 
+
+    XT2 = Params.ScreenSize(1) * Params.Feedback.PosH;
+    YT2 = Params.ScreenSize(2) / 2 - Params.ScreenSize(2) * ... 
+        Params.PosSpace;
+
+    % Draw/ Display Text 
+    DrawFormattedText(WSS, DisplayText, XT1, YT1, 0 , 45);   
+    DrawFormattedText(WSS, DisplayText, XT2, YT2, 0 , 45);   
+
+    % Flip, Don't Erase Buffer
+    Screen('Flip', WSS, [], 1)
+
+end

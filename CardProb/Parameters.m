@@ -86,8 +86,6 @@ end
 % Information
 Params.NumberofRuns = 10;
 Params.NumberofTrial = 12;
-Params.MoneyReward = '1.00';
-Params.MoneyPunish = '0.50';
 Params.StartingMoney = '10';
 
 % Timing
@@ -106,21 +104,32 @@ Params.TotalCue4 = 24;
 Params.TotalCue5 = 24;
 Params.TotalTrials = 120;
 
-Params.Cue1 = '@';
-Params.Cue1Weight = 100;
-Params.Cue2 = '#';
-Params.Cue2Weight = 0;
-Params.Cue3 = '%';
-Params.Cue3Weight = 66;
-Params.Cue4 = '&';
-Params.Cue4Weight = 33;
-Params.Cue5 = '^';
-Params.Cue5Weight = 50;
+Params.Cue{1} = '@';
+Params.CueWeight{1} = 100;
+Params.Cue{2} = '#';
+Params.CueWeight{2} = 0;
+Params.Cue{3} = '%';
+Params.CueWeight{3} = 66;
+Params.Cue{4} = '&';
+Params.Cue4Weight{4} = 33;
+Params.Cue{5} = '^';
+Params.CueWeight{5} = 50;
 
 Params.CueQuestion = '?';
 
-
 % Card Data
-Params.CardRatio = 4;
-Params.CardSize = 1/24;
-Params.CardBackground = [ 0 0 0 ]; 
+Params.Card.Ratio = 4;
+Params.Card.Size = 1/24;
+Params.Card.Background = [ 0 0 0 ]; 
+Params.Card.Low = [ 1 2 3 4 ];
+Params.Card.LowLength = length(Params.Card.Low);
+Params.Card.High = [ 6 7 8 9 ];
+Params.Card.HighLength = length(Params.Card.High);
+
+% Feedback Data
+Params.Feedback.PosH = 3/4;
+Params.Feedback.PosSpace = 1/36;
+Params.Feedback.RewardColor = [ 0 128 0 ]; %Green
+Params.Feedback.PunishColor = [ 255 0 0 ]; %Red
+Params.Feedback.RewardMoney = 1;
+Params.Feedback.PunishMoney = -.5;

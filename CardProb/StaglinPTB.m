@@ -61,7 +61,7 @@ Params.Backup_Data_DIR = '';
 VAT.TimeStamps      = [];
 VAT.TScode          = [];
 VAT.KeyCode         = [];
-VAT.Results         = [];
+VAT.Results         = {};
 
 %% Activate Keyboard
 KbName('UnifyKeyNames');
@@ -98,8 +98,8 @@ BB4 = KbName('4');    % Button Box 4 (Red Key)
 % olddisabledkeys=DisableKeysForKbCheck([])
 
 %% Initialize the random stream
-RandStream.setDefaultStream(...
-    RandStream('mt19937ar','seed',sum(100*clock)));
+%RandStream.setDefaultStream(...
+%    RandStream('mt19937ar','seed',sum(100*clock)));
 
 
 %%%%%%%%%%%%%%%%%

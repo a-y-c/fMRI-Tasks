@@ -1,8 +1,20 @@
-function TrialVariables = ParadigmJitter(BlockNumber, Params, ScreenHandels)
-% TrialVariables = ...
-% ExampleParadigmJitter(BlockNumber, Params, ScreenHandels)
+function [ VAT ] = ParadigmJitter(BlockNumber, Params, ...
+        ScreenHandels, VAT)
+% VAT = ...
+% ParadigmJitter(BlockNumber, Params, ScreenHandels, VAT)
 %
 %******************************************************************
+%   INPUT:
+%       BlockNumber = Block Number
+%       VAT ->
+%               .StartTime      = Time Start
+%               .TimeStamp[]    = Time Log of Events
+%               .TSCode{}       = Name of Events
+%               .j              = Global Counter
+%               .Results{}      = Result Struct 
+%   
+%******************************************************************
+%
 %
 % Written by Cameron Rodriguez
 %   2012/02/08
@@ -11,6 +23,7 @@ function TrialVariables = ParadigmJitter(BlockNumber, Params, ScreenHandels)
 %
 %******************************************************************
 %   DEPENDENCIES:
+%       InitiateKeys.m
 %
 %   DEPENDENT BY:
 %       StaglingPTB.m
@@ -23,30 +36,7 @@ function TrialVariables = ParadigmJitter(BlockNumber, Params, ScreenHandels)
 %% Activate Keyboard
 KbName('UnifyKeyNames');
 FlushEvents('keyDown');
-
-space=KbName('SPACE');
-esc=KbName('ESCAPE');
-right=KbName('RightArrow');
-left=KbName('LeftArrow');
-up=KbName('UpArrow');
-down=KbName('DownArrow');
-shift=KbName('RightShift');
-
-Keys.OKKey = KbName('p');
-Keys.KillKey = KbName('k');
-Keys.TRKey1 = KbName('t'); % TR signal key
-Keys.TRKey2 = KbName('5'); % TR signal key
-Keys.TRKB = KbName('5%');  % Keyboard TR
-
-Keys.KB1 = KbName('1!');   % Keyboard 1
-Keys.KB2 = KbName('2@');   % Keyboard 1
-Keys.KB3 = KbName('3#');   % Keyboard 1
-Keys.KB4 = KbName('4$');   % Keyboard 1
-
-Keys.BB1 = KbName('1');    % Button Box 1
-Keys.BB2 = KbName('2');    % Button Box 2
-Keys.BB3 = KbName('3');    % Button Box 3
-Keys.BB4 = KbName('4');    % Button Box 4
+Keys = InitiateKeys;
 
 % Keep KbCheck for looking for the TR signals
 olddisabledkeys = DisableKeysForKbCheck([KbName('T'),KbName('5')]); 
@@ -63,23 +53,11 @@ ifiS = ScreenHandels.ifiS; % interframe interval Subject
 %%%%%%%%%
 % SETUP %
 %%%%%%%%%
-%% Preallocate Variable for Speed
-VAT.TimeCodes = nan(1, 1000);
-VAT.TimeStamps = nan(1, 1000);
-VAT.KeyCodes = nan(1, 1000);
-j = 1; %Counter
-
 %% Set Initial Variable
-VAT.TimeStamps(1) = GetSecs;
-VAT.TimeCodes(1) = 3; % Block Begin
-VAT.KeyCodes(1) = -1; % No Key Press
-
-%% Set Up 
-Params.TotalCue1 = 24;
-Params.TotalCue2 = 24;
-Params.TotalCue3 = 24;
-Params.TotalCue4 = 24;
-Params.TotalCue5 = 24;
+VAT.TimeStamps(VAT.j) = GetSecs - VAT.StartTime;
+VAT.TimeCodes{VAT.j} =  [ 'Block Start ', BlockNumber ]; 
+VAT.j = VAT.j + 1;
+%disp([ 'Block Start ', BlockNumber ]);
 
 ONE = ones(1, Params.TotalCue1);
 TWO = repmat(2, 1, Params.TotalCue2);
@@ -91,6 +69,7 @@ FIVE = repmat(5, 1, Params.TotalCue5);
 ix = randperm(Params.TotalTrials);
 UnorderedTrialSet = [ ONE, TWO, THREE, FOUR, FIVE ];
 Params.TrialSet = UnorderedTrialSet(ix);
+RunningTotal = Params.StartingMoney;
 
 %%%%%%%%%%%%%%
 % EXPERIMENT %
@@ -101,74 +80,74 @@ for i = 1:Params.TrialSet
     
     CueText = Params.Cue{Params.TrialSet(i)};
     CueWeight = Params.Cue{Params.TrialSet(i)};
-    [ CueNumber, Keys.Answer ] = CalcProb(Params.Card, CueWeight);
+    [ CueNumber, HighOrLow ] = CalcProb(Params.Card, CueWeight);
 
-    % Draw Inital Cue  
-    [VAT, j] = DrawCard(WSS, Params.ScreenSize, ...
+    % Draw Inital Cue  // VAT.j = -7
+    MSG = Params.MSG.InitialCue;
+    [ VAT ] = DrawCard(WSS, Params.ScreenSize, ...
         Params.Card.Ratio, Params.Card.Size, ...
-        CueText, Params.Card.Background, VAT, j );
+        CueText, Params.Card.Background, MSG, VAT);
     WaitSecs(Params.Timing.Cue);
 
-    % Fixation Point
-    [VAT, j] = DrawFixationPt(WSS, RSS, VAT, j); 
+    % Fixation Point // VAT.j = -6 
+    MSG = Params.MSG.Fixation;
+    [ VAT ] = DrawFixationPt(WSS, RSS, MSG,  VAT); 
     WaitSecs(Params.Timing.ITI1);
 
-    % Draw Question Cue 
-    CueText = Params.CueQuestion;
-    [VAT, j] = DrawCard(WSS, Params.ScreenSize, ...
+    % Draw Question Cue  // VAT.j = -5 
+    MSG = Params.MSG.QuestionCue;
+    [ VAT ] = DrawCard(WSS, Params.ScreenSize, ...
         Params.Card.Ratio, Params.Card.Size, ...
-        CueText, Params.Card.Background, VAT, j );
+        Params.CueQuestion, Params.Card.Background, ...
+        MSG, VAT);
 
-    % Wait for Response 
-    [VAT, j, RT] = GetKeyPresWithTimeOut( Keys, VAT, ...
-        j, Params.Timing.Guess);
+    % Wait for Response // VAT.j = -4
+    MSG = Params.MSG.RecordInput;
+    [VAT, RT, Response] = GetKeyPresWithTimeOut( Keys, ...
+        MSG, VAT, Params.Timing.Guess);
     WaitSecs(Params.Timing.Guess - RT);
 
-    % Draw OutCome Cue 
-    [VAT, j] = DrawCard(WSS, Params.ScreenSize, ...
+    % Draw OutCome Cue // VAT.j = -3 
+    MSG = Params.MSG.OutComeCue;
+    [ VAT ] = DrawCard(WSS, Params.ScreenSize, ...
         Params.Card.Ratio, Params.Card.Size, ...
-        CueNumber, Params.Card.Background, VAT, j );
+        CueNumber, Params.Card.Background, MSG, VAT);
     WaitSecs(Params.Outcome);
 
-    % Draw Reward/Punishment
-    [VAT, j] = DrawFeed(WSS, Params.ScreenSize, ...
-        Params.Feedback, VAT, j);
+    % Draw Reward/Punishment // VAT.j = -2 
+    [ DisplayInfo, RunningTotal ] = CalcFeedback ( ...
+            Params.Feedback, Response, ...
+            HighOrLow, RunningTotal)
+    MSG = Params.MSG.Feedback;
+    [ VAT ] = DrawFeed(WSS, Params.ScreenSize, ...
+        Params.Feedback, DisplayInfo, MSG, VAT );
 
-    % Fixation Point
-    [VAT, j] = DrawFixationPt(WSS, RSS, VAT, j); 
+    % Fixation Point // VAT.j = -1
+    MSG = Params.MSG.Fixation;
+    [ VAT ] = DrawFixationPt(WSS, RSS, MSG, VAT); 
     WaitSecs(Params.Time.ITI2);
 
 
     %% Save Data
     VAT.Results{i}.Cue = CueText;
-    VAT.Results{i}.CueWeight = CueWeight;
-    VAT.Results{i}.CueOnset = 
-    VAT.Results{i}.
-    VAT.Results{i}.
-    VAT.Results{i}.
-    VAT.Results{i}.
-    VAT.Results{i}.
-    VAT.Results{i}.
-    VAT.Results{i}.
+    VAT.Results{i}.CueProbability = CueWeight;
+    VAT.Results{i}.CueRange = HighOrLow;
+    VAT.Results{i}.CueNumber = CueNumber;
+    VAT.Results{i}.CueOnset = VAT.TimeStamps(VAT.j - 7);
+    VAT.Results{i}.Response = Response;
+    VAT.Results{i}.ResponseTime = RT;
+    %VAT.Results{i}.
 
 % End Loop 
 end
 
 Screen('Close'); % Close the Open Textures
 
-VAT.TimeStamps(find(isnan(VAT.TimeStamps),1)) = GetSecs;
-VAT.TimeCodes(find(isnan(VAT.TimeCodes),1)) = 4; % Block Ends
-VAT.KeyCodes(find(isnan(VAT.KeyCodes),1)) = -1;
+VAT.TimeStamps(VAT.j) = GetSecs - VAT.StartTime;
+VAT.TimeCodes{VAT.j} =  [ 'Block End', BlockNumber ]; 
+VAT.j = VAT.j + 1;
+%disp([ 'Block Start ', BlockNumber ]);
 
-%% Trim off the excess and pack in a stuct to pass out
-VAT.TimeStamps(isnan(VAT.TimeStamps)) = []; 
-VAT.TimeCodes(isnan(VAT.TimeCodes)) = [];
-VAT.KeyCodes(isnan(VAT.KeyCodes)) = [];
-
-%% These are the Variables to Bounce OUT
-TrialVariables.TimeStamps = VAT.TimeStamps;
-TrialVariables.TScode = VAT.TimeCodes;
-TrialVariables.KeyCodes = VAT.KeyCodes;
 end
 
 
@@ -177,25 +156,25 @@ end
 % FUNCTIONS %
 %%%%%%%%%%%%%
 %% Draw Fixation Point
-    %IN -> Screen, Screen, LOG, COUNTER
-    %OUT -> LOG, COUNTER
-function [VAT, j] = DrawFixationPt(WSS, RSS, VAT, j)
+    %IN -> Screen, Screen, Display MSG, LOG 
+    %OUT -> LOG
+function [ VAT ] = DrawFixationPt(WSS, RSS, MSG, VAT)
     Screen('FillRect', WSS, 128, RSS);
     Screen('DrawDots', WSS, [0, 0], 10, 255*[1 0 0 1], ... 
            [RSS(3)/2 RSS(4)/2], 1); 
     Screen('DrawingFinished', WSS);
 
     % Record Timing
-    VAT.TimeStamps(j) = Screen('Flip',WSS);
-    VAT.KeyCodes(j) = -1; 
-    VAT.TimeCodes(j) = 7;
-    j = j+1; % Advance Counter
+    VAT.TimeStamps(VAT.j) = Screen('Flip',WSS) - VAT.TimeStart;
+    VAT.TSCodes{VAT.j} = MSG;
+    VAT.j = VAT.j + 1; % Advance Counter
 end
 
 % Draw / Display Text            
-    %IN -> Screen, Card
-function [VAT, j] = DrawCard(WSS, ScreenSize, CardRatio, ...
-             CardSize, CueText, Color, VAT, j)
+    %IN -> Screen, Card Stuff, Display MSG, LOG
+    %OUT -> LOG
+function [ VAT ] = DrawCard(WSS, ScreenSize, ...
+            CardRatio, CardSize, CueText, Color, MSG, VAT)
     
     % Calculate Location of Image
     CardX1 = ScreenSize(1)/2 - ...
@@ -216,17 +195,16 @@ function [VAT, j] = DrawCard(WSS, ScreenSize, CardRatio, ...
     DrawFormattedText(WSS, CueText, 'center', 'center', 0, 45);
     
     % Record Timing
-    TimeStamps(j) = Screen('Flip',WSS);
-    KeyCodes(j) = -1; 
-    TimeCodes(j) = 5;
-    j = j+1; % Advance Counter
+    VAT.TimeStamps(VAT.j) = Screen('Flip',WSS) - VAT.StartTime;
+    VAT.TSCodes{VAT.j} = MSG;
+    VAT.j = VAT.j + 1; % Advance Counter
 end
 
 %% Record Key Press
-    %IN -> Accept KEYS, LOG, Counter, MAx
-    %OUT -> Log, Counter, Response Time
-function [VAT, j, RT] = ...
-    GetKeyPressWithTimeOut(Keys, VAT, j, maxTime)
+    %IN -> Accept KEYS, MSG, LOG, MAX
+    %OUT -> Log,  Response Time
+function [VAT, RT, Response] = ...
+    GetKeyPressWithTimeOut(Keys, MSG, VAT, maxTime)
 
     baseTime = GetSecs;
     gotgood = false;
@@ -261,27 +239,13 @@ function [VAT, j, RT] = ...
         WaitSecs(0.001);
     end
 
-    if Keys.Answer == 'high'
-        if (KbName(keyCode)) == Keys.KB1 |
-            KbName(keyCode)) == Keys.KB2 )
-            VAT.Answer = True;
-        else
-           VAT.Answer = FALSE; 
-        end
-    else
-        if (KbName(keyCode)) == Keys.KB3 |
-            KbName(keyCode)) == Keys.KB4 )
-            VAT.Answer = True;
-        else
-            VAT.Answer = False;
-    end
-
-    VAT.TimeStamps(j) = secs;
+    VAT.TimeStamps(VAT.j) = secs - VAT.StartTime;
     %disp( KbName(keyCode));
     %KeyCodes(j) = str(KbName(keyCode))); 
-    VAT.KeyCodes(j) = find(keyCode,1);
-    VAT.TimeCodes(j) = 8;
-    j = j+1; % Advance Counter
+    %VAT.KeyCodes(j) = find(keyCode,1);
+    Response = find(keyCode,1);
+    VAT.TSCodes{VAT.j} = MSG;
+    VAT.j = VAT.j + 1; % Advance Counter
 end
 
 %% Calculate Probability of Card High Low
@@ -304,27 +268,72 @@ function [CueNumber, Ans] = CalcProb(Card, Weight)
     end
 end
 
-%% Calculate/Draw Punishment Reward Feedback
+%% Draw Punishment Reward Feedback
     %IN -> Screen, Screen, Feedback, Log, Counter
-    %OUT -> Log, Counter
-function [VAT, j] = DrawFeed(WSS, Params.ScreenSize, ...
-    Feedback, VAT, j )
+    %OUT -> Log 
+function [ VAT ] = DrawFeed(WSS, ScreenSize, ...
+    Feedback, DisplayInfo, MSG, VAT)
     
     % Calculate in Money Format
     format bank;
     
-    XT1 = Params.ScreenSize(1) * Params.Feedback.PosH;
-    YT1 = Params.ScreenSize(2) / 2; 
+    XT1 = ScreenSize(1) * Feedback.PosH;
+    YT1 = ScreenSize(2) / 2; 
 
-    XT2 = Params.ScreenSize(1) * Params.Feedback.PosH;
-    YT2 = Params.ScreenSize(2) / 2 - Params.ScreenSize(2) * ... 
-        Params.PosSpace;
+    XT2 = ScreenSize(1) * Feedback.PosH;
+    YT2 = ScreenSize(2) / 2 - ScreenSize(2) * ... 
+        Feedback.PosSpace;
 
     % Draw/ Display Text 
-    DrawFormattedText(WSS, DisplayText, XT1, YT1, 0 , 45);   
-    DrawFormattedText(WSS, DisplayText, XT2, YT2, 0 , 45);   
+    DrawFormattedText(WSS, DisplayInfo.Text, XT1, YT1, 0 , 45);   
+    DrawFormattedText(WSS, DisplayInfo.Total, XT2, YT2, 0 , 45);   
 
     % Flip, Don't Erase Buffer
-    Screen('Flip', WSS, [], 1)
+    VAT.TimeStamps(VAT.j) = Screen('Flip', WSS, [], 1) ... 
+        - VAT.StartTime;
+    VAT.TSCodes{VAT.j} = MSG;
+    VAT.j = VAT.j + 1; % Advance Counter
 
 end
+
+%% Calculate Feedback to Display
+    %IN -> Feedback, Response, Check, Total
+    %OUT -> Total, Output
+function [ DisplayInfo, RunningTotal ] = CalcFeedback...
+        (Feedback, Response, HighOrLow, RunningTotal)  
+
+    % If Probabilitiy is High
+    if HighOrLow == 'high'
+        if Response == '1' || Response = '2'
+            RunningTotal = RunningTotal + Feedback.RewardMoney;
+            DisplayInfo.Total = RunningTotal;
+            DisplayInfo.Text = Params.Feedback.RewardText; 
+       else
+            RunningTotal = RunningTotal - Feedback.PunishMoney; 
+            DisplayInfo.Total = RunningTotal;
+            DisplayInfo.Text = Params.Feedback.PunishText; 
+        end
+    % If Probability is Low
+    else
+        if Response == '3' || Response = '4'
+            RunningTotal = RunningTotal + Feedback.RewardMoney;
+            DisplayInfo.Total = RunningTotal;
+            DisplayInfo.Text = Params.Feedback.RewardText; 
+       else
+            RunningTotal = RunningTotal - Feedback.PunishMoney; 
+            DisplayInfo.Total = RunningTotal;
+            DisplayInfo.Text = Params.Feedback.PunishText; 
+        end
+    end
+end 
+
+
+
+
+
+
+
+
+
+
+

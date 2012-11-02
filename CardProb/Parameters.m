@@ -133,3 +133,15 @@ Params.Feedback.RewardColor = [ 0 128 0 ]; %Green
 Params.Feedback.PunishColor = [ 255 0 0 ]; %Red
 Params.Feedback.RewardMoney = 1;
 Params.Feedback.PunishMoney = -.5;
+Params.Feedback.RewardText = 'REWARD';
+Params.Feedback.PunishText = 'PUNISH';
+
+% Log Event Messages
+Params.MSG.InitalCue = 'Draw Stim Cue';
+Params.MSG.Fixation = 'Draw Fixation';
+Params.MSG.QuestionCue = 'Draw Question Cue';
+Params.MSG.RecordInput = 'Record Input';
+Params.MSG.OutComeCue = 'Draw Outcome Cue';
+Params.MSG.Feedback = 'Draw Feedback';
+
+

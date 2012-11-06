@@ -120,7 +120,7 @@ try % Start Try - Catch
     disp('Starting Experiment')
         
     % Running Experiment
-    [ VAT  ] = Paradigm(1, Params, ScreenHandels, VAT);
+     VAT  = Paradigm(1, Params, ScreenHandels, VAT);
 
    % End Event Capture
     VAT.TimeStamps(VAT.j) = GetSecs - VAT.StartTime;
@@ -130,7 +130,7 @@ try % Start Try - Catch
 %%%%%%%%%%%%%%%%%%%%%%%     
 %% Save The Raw Data %%
 %%%%%%%%%%%%%%%%%%%%%%%
-    if TestMode == 0
+    if Params.TestMode == 0
         % Vat.TimeStamp Remade for better read
         save([Params.Data_DIR,Params.Filename,'.mat'], ...
             'Params', 'VAT');

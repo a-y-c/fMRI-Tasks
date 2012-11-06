@@ -56,7 +56,7 @@ Params.DrawFixationPt = 1; % 1 = On, 0 = Off
 Params.RTA = 0; %Real Time Analysis 1 = On, 0 = Off
 Params.UseOneMonitor = 1; % Only use 1 monitor otherwise 
                           % use 2 if available and not in TestMode
-
+Params.UseFullScreen = 0; % Use the Full Screen, not 1/4
 
 %%%%%%%%%%
 % TIMING %
@@ -86,15 +86,18 @@ end
 % Information
 Params.NumberofRuns = 10;
 Params.NumberofTrial = 12;
-Params.StartingMoney = '10';
+Params.StartingMoney = 10.00;
 
 % Timing
 Params.Timing.Cue = 1.5;
-Params.Timing.ITI1 = 10.5;
+%Params.Timing.ITI1 = 10.5;
+Params.Timing.ITI1 = 1.5;
 Params.Timing.Guess = 2.5;
 Params.Timing.Outcome = 0.5;
+%Params.Timing.Feedback = 0.5;
 Params.Timing.Feedback = 0.5;
-Params.Timing.ITI2 = 11.5;
+%Params.Timing.ITI2 = 11.5;
+Params.Timing.ITI2 = 1.5;
                           
 % Cue Data
 Params.TotalCue1 = 24;
@@ -111,33 +114,33 @@ Params.CueWeight{2} = 0;
 Params.Cue{3} = '%';
 Params.CueWeight{3} = 66;
 Params.Cue{4} = '&';
-Params.Cue4Weight{4} = 33;
+Params.CueWeight{4} = 33;
 Params.Cue{5} = '^';
 Params.CueWeight{5} = 50;
 
 Params.CueQuestion = '?';
 
 % Card Data
-Params.Card.Ratio = 4;
-Params.Card.Size = 1/24;
-Params.Card.Background = [ 0 0 0 ]; 
+Params.Card.Ratio = 3.5;
+Params.Card.Size = 1/15;
+Params.Card.Background = [ 255 255 255 ]; 
 Params.Card.Low = [ 1 2 3 4 ];
 Params.Card.LowLength = length(Params.Card.Low);
 Params.Card.High = [ 6 7 8 9 ];
 Params.Card.HighLength = length(Params.Card.High);
 
 % Feedback Data
-Params.Feedback.PosH = 3/4;
-Params.Feedback.PosSpace = 1/36;
+Params.Feedback.PosH = 2/3;
+Params.Feedback.PosSpace = 1/28;
 Params.Feedback.RewardColor = [ 0 128 0 ]; %Green
 Params.Feedback.PunishColor = [ 255 0 0 ]; %Red
 Params.Feedback.RewardMoney = 1;
-Params.Feedback.PunishMoney = -.5;
+Params.Feedback.PunishMoney = .5;
 Params.Feedback.RewardText = 'REWARD';
 Params.Feedback.PunishText = 'PUNISH';
 
 % Log Event Messages
-Params.MSG.InitalCue = 'Draw Stim Cue';
+Params.MSG.InitialCue = 'Draw Stim Cue';
 Params.MSG.Fixation = 'Draw Fixation';
 Params.MSG.QuestionCue = 'Draw Question Cue';
 Params.MSG.RecordInput = 'Record Input';

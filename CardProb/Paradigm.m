@@ -75,8 +75,8 @@ RunningTotal = Params.StartingMoney;
 % EXPERIMENT %
 %%%%%%%%%%%%%%
 % Loop Through Each Trial
-for i = 1:Params.TrialSet
-    disp(i)
+for i = 1:Params.TotalTrials
+    disp(['Trial: ' num2str(i)])
     
     CueText = Params.Cue{Params.TrialSet(i)};
     CueWeight = Params.Cue{Params.TrialSet(i)};
@@ -86,12 +86,12 @@ for i = 1:Params.TrialSet
     MSG = Params.MSG.InitialCue;
     [ VAT ] = DrawCard(WSS, Params.ScreenSize, ...
         Params.Card.Ratio, Params.Card.Size, ...
-        CueText, Params.Card.Background, MSG, VAT);
+        CueText, Params.Card.Background, MSG, 1, VAT);
     WaitSecs(Params.Timing.Cue);
 
     % Fixation Point // VAT.j = -6 
     MSG = Params.MSG.Fixation;
-    [ VAT ] = DrawFixationPt(WSS, RSS, MSG,  VAT); 
+    [ VAT ] = DrawFixationPt(WSS, RSS, MSG, VAT); 
     WaitSecs(Params.Timing.ITI1);
 
     % Draw Question Cue  // VAT.j = -5 
@@ -99,11 +99,11 @@ for i = 1:Params.TrialSet
     [ VAT ] = DrawCard(WSS, Params.ScreenSize, ...
         Params.Card.Ratio, Params.Card.Size, ...
         Params.CueQuestion, Params.Card.Background, ...
-        MSG, VAT);
+        MSG, 1, VAT);
 
     % Wait for Response // VAT.j = -4
     MSG = Params.MSG.RecordInput;
-    [VAT, RT, Response] = GetKeyPresWithTimeOut( Keys, ...
+    [ VAT, RT, Response ] = GetKeyPressWithTimeOut( Keys, ...
         MSG, VAT, Params.Timing.Guess);
     WaitSecs(Params.Timing.Guess - RT);
 
@@ -111,30 +111,33 @@ for i = 1:Params.TrialSet
     MSG = Params.MSG.OutComeCue;
     [ VAT ] = DrawCard(WSS, Params.ScreenSize, ...
         Params.Card.Ratio, Params.Card.Size, ...
-        CueNumber, Params.Card.Background, MSG, VAT);
-    WaitSecs(Params.Outcome);
+        num2str(CueNumber), Params.Card.Background, MSG, 0, VAT);
+    WaitSecs(Params.Timing.Outcome);
 
     % Draw Reward/Punishment // VAT.j = -2 
     [ DisplayInfo, RunningTotal ] = CalcFeedback ( ...
             Params.Feedback, Response, ...
-            HighOrLow, RunningTotal)
+            HighOrLow, RunningTotal);
     MSG = Params.MSG.Feedback;
     [ VAT ] = DrawFeed(WSS, Params.ScreenSize, ...
         Params.Feedback, DisplayInfo, MSG, VAT );
+    WaitSecs(Params.Timing.Feedback);
 
     % Fixation Point // VAT.j = -1
     MSG = Params.MSG.Fixation;
     [ VAT ] = DrawFixationPt(WSS, RSS, MSG, VAT); 
-    WaitSecs(Params.Time.ITI2);
+    WaitSecs(Params.Timing.ITI2);
 
 
     %% Save Data
     VAT.Results{i}.Cue = CueText;
+    VAT.REsults{i}.CueNumber = Params.TrialSet(i);
     VAT.Results{i}.CueProbability = CueWeight;
     VAT.Results{i}.CueRange = HighOrLow;
     VAT.Results{i}.CueNumber = CueNumber;
     VAT.Results{i}.CueOnset = VAT.TimeStamps(VAT.j - 7);
     VAT.Results{i}.Response = Response;
+    VAT.Results{i}.Correct = DisplayInfo.Text;
     VAT.Results{i}.ResponseTime = RT;
     %VAT.Results{i}.
 
@@ -165,7 +168,7 @@ function [ VAT ] = DrawFixationPt(WSS, RSS, MSG, VAT)
     Screen('DrawingFinished', WSS);
 
     % Record Timing
-    VAT.TimeStamps(VAT.j) = Screen('Flip',WSS) - VAT.TimeStart;
+    VAT.TimeStamps(VAT.j) = Screen('Flip',WSS) - VAT.StartTime;
     VAT.TSCodes{VAT.j} = MSG;
     VAT.j = VAT.j + 1; % Advance Counter
 end
@@ -174,17 +177,17 @@ end
     %IN -> Screen, Card Stuff, Display MSG, LOG
     %OUT -> LOG
 function [ VAT ] = DrawCard(WSS, ScreenSize, ...
-            CardRatio, CardSize, CueText, Color, MSG, VAT)
+            CardRatio, CardSize, CueText, Color, MSG, Flip, VAT)
     
     % Calculate Location of Image
     CardX1 = ScreenSize(1)/2 - ...
-        (ScreenSize(1)/2*CardSize) 
+        (ScreenSize(1)/2*CardSize);
     CardX2 = ScreenSize(1)/2 + ...
-        (ScreenSize(1)/2*CardSize) 
+        (ScreenSize(1)/2*CardSize); 
     CardY1 = ScreenSize(2)/2 - ...
-        (ScreenSize(2)/2*CardRatio*CardSize) 
+        (ScreenSize(2)/2*CardRatio*CardSize); 
     CardY2 = ScreenSize(2)/2 + ...
-        (ScreenSize(2)/2*CardRatio*CardSize) 
+        (ScreenSize(2)/2*CardRatio*CardSize); 
 
     Dest = [ CardX1 CardY1 CardX2 CardY2 ]; 
     
@@ -195,7 +198,12 @@ function [ VAT ] = DrawCard(WSS, ScreenSize, ...
     DrawFormattedText(WSS, CueText, 'center', 'center', 0, 45);
     
     % Record Timing
-    VAT.TimeStamps(VAT.j) = Screen('Flip',WSS) - VAT.StartTime;
+    if Flip == 1
+        VAT.TimeStamps(VAT.j) = Screen('Flip',WSS) - VAT.StartTime;
+    else
+        VAT.TimeStamps(VAT.j) = Screen('Flip',WSS, [], 1) ...
+                - VAT.StartTime;
+    end
     VAT.TSCodes{VAT.j} = MSG;
     VAT.j = VAT.j + 1; % Advance Counter
 end
@@ -214,8 +222,8 @@ function [VAT, RT, Response] = ...
         if( GetSecs-baseTime > maxTime )
             secs = baseTime + maxTime;
             RT = maxTime;
-            key = 'T'; % Capitalized
-            return;
+            Response = '0'; % Capitalized
+            break;
         end 
         WaitSecs(0.001);
     
@@ -239,11 +247,21 @@ function [VAT, RT, Response] = ...
         WaitSecs(0.001);
     end
 
+    % Format Output to be Read. Only Button Box
+    if keyCode(Keys.KB1) || keyCode(Keys.BB1)
+        Response = '1';
+    elseif keyCode(Keys.KB2) || keyCode(Keys.BB2)
+        Response = '2';
+    elseif keyCode(Keys.KB3) || keyCode(Keys.BB3)
+        Response = '3';
+    elseif keyCode(Keys.KB4) || keyCode(Keys.BB4)
+        Response = '4';
+    else
+        Response = '0';
+    end
+
     VAT.TimeStamps(VAT.j) = secs - VAT.StartTime;
-    %disp( KbName(keyCode));
-    %KeyCodes(j) = str(KbName(keyCode))); 
-    %VAT.KeyCodes(j) = find(keyCode,1);
-    Response = find(keyCode,1);
+    disp(['Response: ' Response])
     VAT.TSCodes{VAT.j} = MSG;
     VAT.j = VAT.j + 1; % Advance Counter
 end
@@ -259,12 +277,12 @@ function [CueNumber, Ans] = CalcProb(Card, Weight)
     if Weight > randnum
         randpos = randi([1, Card.HighLength]);
         CueNumber = Card.High(randpos);
-        Ans = 'high'
+        Ans = 'high';
     % Low
     else 
         randpos = randi([1, Card.LowLength]);
         CueNumber = Card.Low(randpos);
-        Ans = 'low'
+        Ans = 'low';
     end
 end
 
@@ -275,18 +293,19 @@ function [ VAT ] = DrawFeed(WSS, ScreenSize, ...
     Feedback, DisplayInfo, MSG, VAT)
     
     % Calculate in Money Format
-    format bank;
-    
     XT1 = ScreenSize(1) * Feedback.PosH;
-    YT1 = ScreenSize(2) / 2; 
+    YT1 = ScreenSize(2)/2 - ScreenSize(2) * ... 
+        Feedback.PosSpace;
 
     XT2 = ScreenSize(1) * Feedback.PosH;
-    YT2 = ScreenSize(2) / 2 - ScreenSize(2) * ... 
+    YT2 = ScreenSize(2)/2 + ScreenSize(2) * ... 
         Feedback.PosSpace;
 
     % Draw/ Display Text 
-    DrawFormattedText(WSS, DisplayInfo.Text, XT1, YT1, 0 , 45);   
-    DrawFormattedText(WSS, DisplayInfo.Total, XT2, YT2, 0 , 45);   
+    DrawFormattedText(WSS, DisplayInfo.Text, XT1, YT1, ...
+             DisplayInfo.Color , 45);   
+    DrawFormattedText(WSS, DisplayInfo.Total, XT2, YT2, ...
+             DisplayInfo.Color , 45);   
 
     % Flip, Don't Erase Buffer
     VAT.TimeStamps(VAT.j) = Screen('Flip', WSS, [], 1) ... 
@@ -303,26 +322,30 @@ function [ DisplayInfo, RunningTotal ] = CalcFeedback...
         (Feedback, Response, HighOrLow, RunningTotal)  
 
     % If Probabilitiy is High
-    if HighOrLow == 'high'
-        if Response == '1' || Response = '2'
+    if strcmpi(HighOrLow, 'high')
+        if Response == '3' || Response == '4'
             RunningTotal = RunningTotal + Feedback.RewardMoney;
-            DisplayInfo.Total = RunningTotal;
-            DisplayInfo.Text = Params.Feedback.RewardText; 
+            DisplayInfo.Total = num2str(RunningTotal, '%.2f');
+            DisplayInfo.Text = Feedback.RewardText; 
+            DisplayInfo.Color = Feedback.RewardColor;
        else
-            RunningTotal = RunningTotal - Feedback.PunishMoney; 
-            DisplayInfo.Total = RunningTotal;
-            DisplayInfo.Text = Params.Feedback.PunishText; 
+            RunningTotal = RunningTotal - Feedback.PunishMoney;
+            DisplayInfo.Total = num2str(RunningTotal, '%.2f');
+            DisplayInfo.Text = Feedback.PunishText; 
+            DisplayInfo.Color = Feedback.PunishColor;
         end
     % If Probability is Low
     else
-        if Response == '3' || Response = '4'
+        if Response == '1' || Response == '2'
             RunningTotal = RunningTotal + Feedback.RewardMoney;
-            DisplayInfo.Total = RunningTotal;
-            DisplayInfo.Text = Params.Feedback.RewardText; 
+            DisplayInfo.Total = num2str(RunningTotal, '%.2f');
+            DisplayInfo.Text = Feedback.RewardText; 
+            DisplayInfo.Color = Feedback.RewardColor;
        else
             RunningTotal = RunningTotal - Feedback.PunishMoney; 
-            DisplayInfo.Total = RunningTotal;
-            DisplayInfo.Text = Params.Feedback.PunishText; 
+            DisplayInfo.Total = num2str(RunningTotal, '%.2f');
+            DisplayInfo.Text = Feedback.PunishText; 
+            DisplayInfo.Color = Feedback.PunishColor;
         end
     end
 end 

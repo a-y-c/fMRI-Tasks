@@ -55,4 +55,4 @@ Keys.BB4 = KbName('4');    % Button Box 4
 
 % Code to be used to later on restore the MRI TR trigger Keys
 % olddisabledkeys=DisableKeysForKbCheck([])
-
+end

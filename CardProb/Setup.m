@@ -28,14 +28,10 @@ function [ Params ] = Setup(Params)
 
 
 %% Display Warning Message
-WarningMessages
+%WarningMessages
 
 %% Who is the Subject ?
-if nargin < 1 
-    Params.Subject.Name = input('Who is the Test Subject? Ex: JD ==> ', 's');
-else
-    Params.Subject.Name = '';
-end
+Params.Subject.Name = input('Who is the Test Subject? Ex: JD ==> ', 's');
 
 %% Test Mode?
 if isempty(Params.Subject.Name)
@@ -47,10 +43,10 @@ end
 
 
 % Input device for subject
-[Params.Subject.HID PARAMS.Subject.HID_Descrip] = hid_probe('subject');
+%[Params.Subject.HID PARAMS.Subject.HID_Descrip] = hid_probe('subject');
 
 % Input device for researcher
-[Params.Researcher.HID PARAMS.Researcher.HID_Descrip] = hid_probe('researcher');
+%[Params.Researcher.HID PARAMS.Researcher.HID_Descrip] = hid_probe('researcher');
 end
 
 %% Display Warning Message
@@ -68,5 +64,7 @@ function WarningMessages
     while( ~strcmp('ESCAPE', KbName(keyCode)) )
         [junk keyCode] = KbPressWait();
     end  
-    
+
+    % Clear keyboard queue
+    while(KbCheck(-1));end;    
 end

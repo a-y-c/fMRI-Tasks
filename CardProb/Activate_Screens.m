@@ -6,8 +6,10 @@ function [ScreenHandels, Screen_Parameters, PPD_DPP] = Activate_Screens(Constant
 %
 % Written by Cameron Rodriguez, base on code that can be found in
 % PTB StereoDemo.m
+% MOD BY Andrew Cho
+%       -- Added Text Size
 %
-% Last Modified 2012/02/08
+% Last Modified 2012/10/08
 %
 %******************************************************************
 %
@@ -43,7 +45,7 @@ if IsOSX == 1
     SubjectScreenID = max(AvailableScreens);
     ExperimenterScreenID = 0;
     rect=Screen('Rect', SubjectScreenID);
-    if numel(AvailableScreens) == 1;
+    if numel(AvailableScreens) == 1 && ~Params.UseFullScreen;
         Srect = [rect(3)/2, rect(4)/2, rect(3), rect(4)];
         OnlyOneScreen = 1;
     else
@@ -54,7 +56,7 @@ else
     SubjectScreenID = max(AvailableScreens);
     ExperimenterScreenID = 1;
     rect=Screen('Rect', SubjectScreenID);
-    if numel(AvailableScreens) == 2;
+    if numel(AvailableScreens) == 2 && ~Params.UseFullScreen;
         Srect = [rect(3)/2, rect(4)/2, rect(3), rect(4)];
         OnlyOneScreen = 1;
     else
@@ -178,6 +180,9 @@ Screen_Parameters.ResolutionExperimenter = [SWE, SHE];
 Screen_Parameters.ResolutionSubject = [SWS, SHS];
 Screen_Parameters.ScreenSizeExperimenter = ScreenSizeExperimenter;
 Screen_Parameters.ScreenSizeSubject = ScreenSizeSubject;
+
+% Declare the Text Size for the screen
+Screen('TextSize',winSubjectScreen, floor(SWS/1024*42));
 
 % get the Pixels Per Degree visual angle and the Degrees Per Pixel
 % visual angle

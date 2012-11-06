@@ -28,4 +28,21 @@ function [ VAT ] = Anaylsis( Params, VAT )
 %
 %******************************************************************
 
+Running.ACC.hundred = 0;   
+Running.ACC.twothirds = 0;   
+Running.ACC.halfs = 0;   
 
+% Loop THrough All the Data
+for i = 1:Params.TotalTrials
+    %[100 0 66 33 50]
+    if Params.CueNumber == 1
+        
+    elseif Params.CueNumber == 2
+
+    elseif Params.CueNumber == 3
+
+    elseif Params.CueNumber == 4
+
+    else
+
+    end

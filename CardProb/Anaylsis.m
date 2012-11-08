@@ -14,10 +14,7 @@ function [ VAT ] = Anaylsis( Params, VAT )
 %   
 %******************************************************************
 %
-%
-% Written by Cameron Rodriguez
-%   2012/02/08
-% Refractor by Andrew Cho
+% Written by Andrew Cho
 %   2012/08/23
 %
 %******************************************************************
@@ -28,21 +25,118 @@ function [ VAT ] = Anaylsis( Params, VAT )
 %
 %******************************************************************
 
-Running.ACC.hundred = 0;   
-Running.ACC.twothirds = 0;   
-Running.ACC.halfs = 0;   
+Results.ACC.hundred = 0;   
+Results.ACC.twothirds = 0;   
+Results.ACC.halfs = 0;   
+% Cue One
+CueOne.AmountCorrect = 0;
+CueOne.Total = 0;
+Results.CueOne = {};
+% Cue Two
+CueTwo.AmountCorrect = 0;
+CueTwo.Total = 0;
+Results.CueTwo = {};
+% Cue Three
+CueThree.AmountCorrect = 0;
+CueThree.Total = 0;
+Results.CueThree = {};
+% Cue Four
+CueFour.AmountCorrect = 0;
+CueFour.Total = 0;
+Results.CueFour = {};
+% Cue Five
+CueFive.AmountCorrect  = 0;
+CueFive.Total = 0;
+Results.CueFive = {};
 
 % Loop THrough All the Data
 for i = 1:Params.TotalTrials
     %[100 0 66 33 50]
-    if Params.CueNumber == 1
-        
-    elseif Params.CueNumber == 2
+    %% Calculate Indivdual Trials
+    if VAT.Results{i}.CueNumber == 1
+       [ CueOne OUT ] = Accuracy( CueOne ...
+                VAT.Results{i}.OutCome, Params.Feedback );
+        Results.CueOne{CueOne.Total} = OUT;
+       
+    elseif VAT.Results{i}.CueNumber == 2
+       [ CueTwo Results.CueTwo{i} ] = Accuracy( CueTwo ...
+                VAT.Results{i}.OutCome, Params.Feedback ); 
+        Results.CueTwo{CueTwo.Total} = OUT;
 
-    elseif Params.CueNumber == 3
+    elseif VAT.Results{i}.CueNumber == 3
+       [ CueThree Results.CueThree{i} ] = Accuracy( CueThree ...
+                VAT.Results{i}.OutCome, Params.Feedback ); 
+        Results.CueThree{CueThree.Total} = OUT;
 
-    elseif Params.CueNumber == 4
+    elseif VAT.Results{i}.CueNumber == 4
+       [ CueFour Results.CueFour{i} ] = Accuracy( CueFour ...
+                VAT.Results{i}.OutCome, Params.Feedback ); 
+        Results.CueFour{CueFour.Total} = OUT;
 
     else
+       [ CueOne Results.CueFive{i} ] = Accuracy( CueFive...
+                VAT.Results{i}.OutCome, Params.Feedback ); 
+        Results.CueFive{CueFive.Total} = OUT;
 
     end
+    
+    % Calculate Early/Middle/Late Periods
+    Results.CueOneTPC = SplitThirdsACC( Results.CueOne )
+    Results.CueTwoTPC = SplitThirdsACC( Results.CueTwo )
+    Results.CueThreeTPC= SplitThirdsACC( Results.CueThree )
+    Results.CueFourTPC = SplitThirdsACC( Results.CueFour )
+    Results.CueFiveTPC = SplitThirdsACC( Results.CueFive )
+end
+
+% Accuracy Calculations (Total, Correct)
+    %IN -> Cue Info, Correct/Incorrect, Feedback Info
+    %OUT -> Cue Info, Accuracy
+function [ Cue Result ] = Accuracy(Cue, Choice, Feedback)
+
+    % Add to Total Cue so Far
+    Cue.Total = Cue.Total + 1;
+
+    % IF Correct, Add Amount and Caculate ACC
+    if strcmpi(Choice, Feedback.RewardText)
+        Cue.AmountCorrect = Cue.AmountCorrect + 1;
+
+        % Record Results
+        Results.ACC = Cue.AmountCorrect / Cue.Total; 
+    % IF Incorrect, Just Caculate ACC
+    else
+        % Record Results
+        Results.ACC = Cue.AmountCorrect / Cue.Total; 
+    end
+
+    % Record Outcome Results
+    Results.OutCome = Choice;
+end
+
+% Accuracy Calculation for Thirds
+    %IN ->
+    %OUT ->
+function [ Results ] = SplitThirdsAcc( Cue )
+    Length1 = length(Cue)/3;
+    Length2 = length(Cue)*2/3;
+    Length3 = length(Cue)/3;
+
+    %First Third
+    Results.FirstACC = Cue{Length1}.AmountCorrect/(Length1);
+    Results.AmountCorrect = Cue{Length1}.AmountCorrect;
+    Results.Total = Length1;
+
+    %Second Thirds
+    AmountC = Cue{Length1}.AmountCorrect - 
+            Cue{Length2}.AmountCorrect;
+    Results.SecondACC = AmountC / (Length1); 
+    Results.AmountCorrect = AmountC;
+    Results.Total = Length2;
+
+    %Third Thirds
+    AmountC = Cue{Length2}.AmountCorrect - 
+            Cue{Length3}.AmountCorrect;
+    Results.ThirdACC = AmountC / (Length1); 
+    Results.AmountCorrect = AmountC;
+    Results.Total = Length3;
+    end 
+end

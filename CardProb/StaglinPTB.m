@@ -127,6 +127,11 @@ try % Start Try - Catch
     VAT.TScode{VAT.j} = 'Scan End';
     VAT.j = VAT.j + 1;
 
+%%%%%%%%%%%%%%
+%% ANALSYIS %%
+%%%%%%%%%%%%%%
+    VAT = Anaylsis(Params, VAT)
+
 %%%%%%%%%%%%%%%%%%%%%%%     
 %% Save The Raw Data %%
 %%%%%%%%%%%%%%%%%%%%%%%

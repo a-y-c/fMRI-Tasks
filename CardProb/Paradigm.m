@@ -115,7 +115,7 @@ for i = 1:Params.TotalTrials
     WaitSecs(Params.Timing.Outcome);
 
     % Draw Reward/Punishment // VAT.j = -2 
-    [ DisplayInfo, RunningTotal ] = CalcFeedback ( ...
+   [ DisplayInfo, RunningTotal ] = CalcFeedback ( ...
             Params.Feedback, Response, ...
             HighOrLow, RunningTotal);
     MSG = Params.MSG.Feedback;
@@ -137,7 +137,7 @@ for i = 1:Params.TotalTrials
     VAT.Results{i}.CueNumber = CueNumber;
     VAT.Results{i}.CueOnset = VAT.TimeStamps(VAT.j - 7);
     VAT.Results{i}.Response = Response;
-    VAT.Results{i}.Correct = DisplayInfo.Text;
+    VAT.Results{i}.OutCome = DisplayInfo.Text;
     VAT.Results{i}.ResponseTime = RT;
     %VAT.Results{i}.
 

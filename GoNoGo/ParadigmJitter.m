@@ -308,7 +308,7 @@ function [VAT, j, RT] = GetKeyPressWithTimeOut(Keys, VAT, j, maxTime)
             key = 'T'; % Capitalized
 
              VAT.TimeStamps(j) = secs;
-             VAT.KeyCodes(j) = 0;
+             VAT.KeyCodes(j) = -1;
              VAT.TimeCodes(j) = 8;
              j = j+1; % Advance Counter
                      return;

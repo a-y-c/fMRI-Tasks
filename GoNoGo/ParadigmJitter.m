@@ -188,7 +188,7 @@ for i = 1:Params.TotalTrials
     if strcmp(Orient, 'vertical')
         Result.CueType(i) = 1;
     else
-        Result.CueType(i) = 0;
+        Result.CueType(i) = 2;
     end
     % Record Stimulus Type 
     Result.StimulusType(i) = TrialSet(i);

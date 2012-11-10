@@ -126,11 +126,13 @@ try % Start Try - Catch
     VAT.TimeStamps(VAT.j) = GetSecs - VAT.StartTime;
     VAT.TScode{VAT.j} = 'Scan End';
     VAT.j = VAT.j + 1;
+    disp('Finished Experiment')
 
 %%%%%%%%%%%%%%
 %% ANALSYIS %%
 %%%%%%%%%%%%%%
-    VAT = Anaylsis(Params, VAT)
+    disp('Starting Anaylsis')
+    Results = Anaylsis(Params, VAT);
 
 %%%%%%%%%%%%%%%%%%%%%%%     
 %% Save The Raw Data %%

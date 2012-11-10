@@ -68,7 +68,7 @@ FIVE = repmat(5, 1, Params.TotalCue5);
 % Presentation Order (Randomized)
 ix = randperm(Params.TotalTrials);
 UnorderedTrialSet = [ ONE, TWO, THREE, FOUR, FIVE ];
-Params.TrialSet = UnorderedTrialSet(ix);
+Params.TrialSet = UnorderedTrialSet(ix)
 RunningTotal = Params.StartingMoney;
 
 %%%%%%%%%%%%%%
@@ -131,10 +131,10 @@ for i = 1:Params.TotalTrials
 
     %% Save Data
     VAT.Results{i}.Cue = CueText;
-    VAT.REsults{i}.CueNumber = Params.TrialSet(i);
+    VAT.REsults{i}.CueIdentity = Params.TrialSet(i);
     VAT.Results{i}.CueProbability = CueWeight;
     VAT.Results{i}.CueRange = HighOrLow;
-    VAT.Results{i}.CueNumber = CueNumber;
+    VAT.Results{i}.CueNum = CueNumber;
     VAT.Results{i}.CueOnset = VAT.TimeStamps(VAT.j - 7);
     VAT.Results{i}.Response = Response;
     VAT.Results{i}.OutCome = DisplayInfo.Text;

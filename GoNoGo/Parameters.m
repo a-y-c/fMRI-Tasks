@@ -96,7 +96,7 @@ Params.Constants.PTBVersion = Screen('Version'); % Get The PTB Version
 % OUTPUT %
 %%%%%%%%%%
 %% Establish Output Files
-Params.Filename  = [ Params.ExperimentName, '_', ...
+Params.Filename  = [ 'LOG/', Params.ExperimentName, '_', ...
              datestr(now,'yyyymmdd_HHMMSS'), '_Subject_', TestSubject];
 Params.Data_DIR = '';
 Params.Backup_Data_DIR = ''; 

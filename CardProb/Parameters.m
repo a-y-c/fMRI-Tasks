@@ -90,22 +90,27 @@ Params.StartingMoney = 10.00;
 
 % Timing
 Params.Timing.Cue = 1.5;
-%Params.Timing.ITI1 = 10.5;
-Params.Timing.ITI1 = 1.5;
+Params.Timing.ITI1 = 10.5;
 Params.Timing.Guess = 2.5;
 Params.Timing.Outcome = 0.5;
-%Params.Timing.Feedback = 0.5;
 Params.Timing.Feedback = 0.5;
-%Params.Timing.ITI2 = 11.5;
-Params.Timing.ITI2 = 1.5;
+Params.Timing.ITI2 = 11.5;
+
+% Timing
+Params.Timing.Cue = 1;
+Params.Timing.ITI1 = 1;
+Params.Timing.Guess = 1;
+Params.Timing.Outcome = 1;
+Params.Timing.Feedback = 1;
+Params.Timing.ITI2 = 1;
                           
 % Cue Data
-Params.TotalCue1 = 24;
-Params.TotalCue2 = 24;
-Params.TotalCue3 = 24;
-Params.TotalCue4 = 24;
-Params.TotalCue5 = 24;
-Params.TotalTrials = 120;
+Params.TotalCue1 = 1;
+Params.TotalCue2 = 1;
+Params.TotalCue3 = 1;
+Params.TotalCue4 = 1;
+Params.TotalCue5 = 1;
+Params.TotalTrials = 5;
 
 Params.Cue{1} = '@';
 Params.CueWeight{1} = 100;

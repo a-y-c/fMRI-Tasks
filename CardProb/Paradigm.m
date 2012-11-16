@@ -131,7 +131,7 @@ for i = 1:Params.TotalTrials
 
     %% Save Data
     VAT.Results{i}.Cue = CueText;
-    VAT.REsults{i}.CueIdentity = Params.TrialSet(i);
+    VAT.Results{i}.CueIdentity = Params.TrialSet(i);
     VAT.Results{i}.CueProbability = CueWeight;
     VAT.Results{i}.CueRange = HighOrLow;
     VAT.Results{i}.CueNum = CueNumber;

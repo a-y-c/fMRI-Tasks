@@ -107,9 +107,9 @@ Params.Backup_Data_DIR = '';
 % TASK DATA %
 %%%%%%%%%%%%%
 % Trials (Percentage)
-Params.TotalTrials = 20;
-Params.VerticalTrials = 10;
-Params.HorizontalTrials = 10;
+Params.TotalTrials = 240;
+Params.VerticalTrials = 120;
+Params.HorizontalTrials = 120;
 Params.VerticalGo = .80;
 Params.VerticalNoGo = .20;
 Params.HorizontalGo = .20;

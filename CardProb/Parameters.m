@@ -84,8 +84,6 @@ switch Params.DesignType
 end
 
 % Information
-Params.NumberofRuns = 10;
-Params.NumberofTrial = 12;
 Params.StartingMoney = 10.00;
 
 % Timing
@@ -97,20 +95,20 @@ Params.Timing.Feedback = 0.5;
 Params.Timing.ITI2 = 11.5;
 
 % Timing
-Params.Timing.Cue = 1;
-Params.Timing.ITI1 = 1;
-Params.Timing.Guess = 1;
-Params.Timing.Outcome = 1;
-Params.Timing.Feedback = 1;
-Params.Timing.ITI2 = 1;
+Params.Timing.Cue = .5;
+Params.Timing.ITI1 = .5;
+Params.Timing.Guess = .5;
+Params.Timing.Outcome = .5;
+Params.Timing.Feedback = .5;
+Params.Timing.ITI2 = .5;
                           
 % Cue Data
-Params.TotalCue1 = 1;
-Params.TotalCue2 = 1;
-Params.TotalCue3 = 1;
-Params.TotalCue4 = 1;
-Params.TotalCue5 = 1;
-Params.TotalTrials = 5;
+Params.TotalCue1 = 5;
+Params.TotalCue2 = 5;
+Params.TotalCue3 = 5;
+Params.TotalCue4 = 5;
+Params.TotalCue5 = 5;
+Params.TotalTrials = 25;
 
 Params.Cue{1} = '@';
 Params.CueWeight{1} = 100;

@@ -117,8 +117,6 @@ olddisabledkeys = DisableKeysForKbCheck([KbName('T'),KbName('5')]);
 %% Run Experiment %
 %%%%%%%%%%%%%%%%%%%
 try % Start Try - Catch
-    disp('Starting Experiment')
-        
     % Running Experiment
      VAT  = Paradigm(1, Params, ScreenHandels, VAT);
 
@@ -133,22 +131,65 @@ try % Start Try - Catch
 %%%%%%%%%%%%%%
     disp('Starting Anaylsis')
     Results = Anaylsis(Params, VAT);
-
+   
 %%%%%%%%%%%%%%%%%%%%%%%     
 %% Save The Raw Data %%
 %%%%%%%%%%%%%%%%%%%%%%%
     if Params.TestMode == 0
         % Vat.TimeStamp Remade for better read
         save([Params.Data_DIR,Params.Filename,'.mat'], ...
-            'Params', 'VAT');
+            'Params', 'VAT', 'Results');
+ 
+        %% Append into Results, Accuracy for Each Cue
+        xlsVAT = {};
+        counter = 0; 
+        CueList = {'CueOne' , 'CueTwo', 'CueThree', 'CueFour', 'CueFive'};
+        for cue = 1:length(CueList) 
+            ACC = [];
+            ResultString = ['Results.' CueList{cue}]
+            for i = 1:length(eval(ResultString))
+                ResultCue = ['Results.' CueList{cue} '{' ... 
+                                num2str(i) '}.ACC']
+                ACC = [ ACC, eval(ResultCue) ]
+            end
+            counter = counter +1;
+            xlsVAT{counter} = ACC;
+        end
+        
+        %% Append into Results, Accuracy for each Block
+        CueTPSList = {'CueOneTPC', 'CueTwoTPC', 'CueThreeTPC', ...
+                    'CueFourTPC', 'CueFiveTPC'};
+        for cue = 1:length(CueTPSList)
+            ACC = [];
+            ResultString = ['Results.' CueTPSList{cue}]
+            CueTPSACCList = {'FirstACC', 'SecondACC', 'ThirdACC'};
+            for i = 1:length(CueTPSACCList)
+                ResultCue = ['Results.' CueTPSList{cue} '.' ... 
+                                CueTPSACCList{i} ]
+                ACC = [ ACC, eval(ResultCue) ]
+            end
+            counter = counter +1;
+            xlsVAT{counter} = ACC;
+        end
+            xlsVAT
+        
+        %% Concat Struct into Matrix,
+        %% Pad with NaN so to make the dimensions equal. 
+        maxSize = max(cellfun(@numel,xlsVAT));
+        fcn = @(x) [x nan(1,maxSize-numel(x))];
+        rmat = cellfun(fcn,xlsVAT, 'UniformOutput', false);
+        rmat = vertcat(rmat{:})
+
+
 
         %save([Params.Backup_Data_DIR,Params.Filename,'.mat'], ...
         %    'Params', 'VAT');
 
         %xlsVAT = [
+          
         %
-        %xlswrite([Params.Backup_Data_DIR,Params.Filename], ...
-        %    xlsVAT);
+        xlswrite([Params.Backup_Data_DIR,Params.Filename], ...
+            rmat);
     end
 
 
@@ -157,12 +198,6 @@ try % Start Try - Catch
     ShowCursor;   
 
         
-%% Run Some Quick Stats % Analysis
-    RTA = 0;
-    if RTA == 1        
-        RealTimeAnalysis(VAT, Params);
-    end
-    
 catch lasterr
     % this "catch" section executes in case of an error in the
     % "try" section above.  The error is captured in "lasterr". 

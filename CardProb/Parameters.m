@@ -88,11 +88,11 @@ Params.StartingMoney = 10.00;
 
 % Timing
 Params.Timing.Cue = 1.5;
-Params.Timing.ITI1 = 10.5;
+Params.Timing.ITI1 = 5.5;
 Params.Timing.Guess = 2.5;
-Params.Timing.Outcome = 0.5;
-Params.Timing.Feedback = 0.5;
-Params.Timing.ITI2 = 11.5;
+Params.Timing.Outcome = 1.5;
+Params.Timing.Feedback = 1.5;
+Params.Timing.ITI2 = 6.5;
 
 % Timing
 Params.Timing.Cue = .5;
@@ -103,12 +103,12 @@ Params.Timing.Feedback = .5;
 Params.Timing.ITI2 = .5;
                           
 % Cue Data
-Params.TotalCue1 = 5;
-Params.TotalCue2 = 5;
-Params.TotalCue3 = 5;
-Params.TotalCue4 = 5;
-Params.TotalCue5 = 5;
-Params.TotalTrials = 25;
+Params.TotalCue1 = 24;
+Params.TotalCue2 = 24;
+Params.TotalCue3 = 24;
+Params.TotalCue4 = 24;
+Params.TotalCue5 = 24;
+Params.TotalTrials = 120;
 
 Params.Cue{1} = '@';
 Params.CueWeight{1} = 100;
@@ -124,8 +124,8 @@ Params.CueWeight{5} = 50;
 Params.CueQuestion = '?';
 
 % Card Data
-Params.Card.Ratio = 3.5;
-Params.Card.Size = 1/15;
+Params.Card.Ratio = 2.5;
+Params.Card.Size = 1/12;
 Params.Card.Background = [ 255 255 255 ]; 
 Params.Card.Low = [ 1 2 3 4 ];
 Params.Card.LowLength = length(Params.Card.Low);

@@ -193,6 +193,13 @@ try % Start Try - Catch
         
         xlswrite([Params.Backup_Data_DIR,Params.Filename], ...
             xlsVAT);
+
+        AmtCorrect = 0;
+        for i = 1:Params.TotalTrials
+            AmtCorrect = AmtCorrect + VAT.Results.Response(i);
+        end
+            %% Display On Console Output
+            Percent = AmtCorrect / Params.TotalTrials
     end
 
 

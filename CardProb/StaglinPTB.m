@@ -89,6 +89,9 @@ Params.PPD_DPP = PPD_DPP;
 %%%%%%%%%%%%%%%%%%%%
 % START EXPERIMENT %
 %%%%%%%%%%%%%%%%%%%%
+% Display Intros
+Intro(ScreenHandels);
+
 %% Wait for the Scan to begin
 Text = 'Waiting for MRI scan to begin...';
 DrawFormattedText(WSS, Text, 'center', 'center', 0 , 45);

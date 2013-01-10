@@ -19,7 +19,7 @@ function Intro(ScreenHandels)
 %******************************************************************
 
 
-IntroText = 'Welcome to the Go/No-Go Task! \n\n Put the index finger on your preferred hand on the button press. \n After a short time, the rectangle will either turn green or blue . \n If the rectangle turns blue, do not respond at all. \n Try to respond as quickly as possible while making as few errors as possible. \n\n Press the button to begin.'
+IntroText = 'Welcome to the Go/No-Go Task! \n\n  GREEN = PRESS \n RED = Do Not Press \n\n Try to respond as quickly as possible while making as few errors as possible. \n\n Press any button to begin.'
 
 %% Unpack Stucts
 WES = ScreenHandels.WES;   % Window Handel Experimenter

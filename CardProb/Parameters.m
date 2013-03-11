@@ -84,31 +84,31 @@ switch Params.DesignType
 end
 
 % Information
-Params.StartingMoney = 10.00;
+Params.StartingMoney = .10;
 
 % Timing
-Params.Timing.Cue = 1.5;
-Params.Timing.ITI1 = 5.5;
-Params.Timing.Guess = 2.5;
-Params.Timing.Outcome = 1.5;
-Params.Timing.Feedback = 1.5;
-Params.Timing.ITI2 = 6.5;
+Params.Timing.Cue       = 1.25;
+Params.Timing.ITI1      = 1;
+Params.Timing.Guess     = 2.25;        
+Params.Timing.Outcome   = 1.25;
+Params.Timing.Feedback  = 1.25;
+Params.Timing.ITI2      = 1;
 
-% Timing
-Params.Timing.Cue = .5;
-Params.Timing.ITI1 = .5;
-Params.Timing.Guess = .5;
-Params.Timing.Outcome = .5;
-Params.Timing.Feedback = .5;
-Params.Timing.ITI2 = .5;
+%% Timing DEBUGG
+%Params.Timing.Cue = .5;
+%Params.Timing.ITI1 = .5;
+%Params.Timing.Guess = .5;
+%Params.Timing.Outcome = .5;
+%Params.Timing.Feedback = .5;
+%Params.Timing.ITI2 = .5;
                           
 % Cue Data
-Params.TotalCue1 = 24;
-Params.TotalCue2 = 24;
-Params.TotalCue3 = 24;
-Params.TotalCue4 = 24;
-Params.TotalCue5 = 24;
-Params.TotalTrials = 120;
+Params.TotalCue1 = 15;
+Params.TotalCue2 = 15;
+Params.TotalCue3 = 15;
+Params.TotalCue4 = 15;
+Params.TotalCue5 = 15;
+Params.TotalTrials = 75;
 
 Params.Cue{1} = '@';
 Params.CueWeight{1} = 100;

@@ -56,7 +56,7 @@ Params.DrawFixationPt = 1; % 1 = On, 0 = Off
 Params.RTA = 0; %Real Time Analysis 1 = On, 0 = Off
 Params.UseOneMonitor = 1; % Only use 1 monitor otherwise 
                           % use 2 if available and not in TestMode
-Params.UseFullScreen = 0; % Use the Full Screen, not 1/4
+Params.UseFullScreen = 1; % Use the Full Screen, not 1/4
 
 %%%%%%%%%%
 % TIMING %
@@ -94,14 +94,14 @@ Params.Timing.Outcome = 1.5;
 Params.Timing.Feedback = 1.5;
 Params.Timing.ITI2 = 6.5;
 
-% Timing
-Params.Timing.Cue = .5;
-Params.Timing.ITI1 = .5;
-Params.Timing.Guess = .5;
-Params.Timing.Outcome = .5;
-Params.Timing.Feedback = .5;
-Params.Timing.ITI2 = .5;
-                          
+%% Timing
+%Params.Timing.Cue = .5;
+%Params.Timing.ITI1 = .5;
+%Params.Timing.Guess = .5;
+%Params.Timing.Outcome = .5;
+%Params.Timing.Feedback = .5;
+%Params.Timing.ITI2 = .5;
+                         
 % Cue Data
 Params.TotalCue1 = 24;
 Params.TotalCue2 = 24;

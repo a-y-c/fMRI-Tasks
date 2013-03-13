@@ -86,17 +86,7 @@ end
 % Information
 Params.StartingMoney = .10;
 
-% Timing
-<<<<<<< HEAD
-Params.Timing.Cue = 1.5;
-Params.Timing.ITI1 = 5.5;
-Params.Timing.Guess = 2.5;
-Params.Timing.Outcome = 1.5;
-Params.Timing.Feedback = 1.5;
-Params.Timing.ITI2 = 6.5;
-
 %% Timing
-=======
 Params.Timing.Cue       = 1.25;
 Params.Timing.ITI1      = 1;
 Params.Timing.Guess     = 2.25;        
@@ -104,19 +94,6 @@ Params.Timing.Outcome   = 1.25;
 Params.Timing.Feedback  = 1.25;
 Params.Timing.ITI2      = 1;
 
-%% Timing DEBUGG
->>>>>>> origin/dev-timing
-%Params.Timing.Cue = .5;
-%Params.Timing.ITI1 = .5;
-%Params.Timing.Guess = .5;
-%Params.Timing.Outcome = .5;
-%Params.Timing.Feedback = .5;
-%Params.Timing.ITI2 = .5;
-<<<<<<< HEAD
-                         
-=======
-                          
->>>>>>> origin/dev-timing
 % Cue Data
 Params.TotalCue1 = 15;
 Params.TotalCue2 = 15;

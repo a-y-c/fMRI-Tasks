@@ -191,26 +191,26 @@ function [ VAT ] = DrawCard(WSS, ScreenSize, ...
     Dest = [ CardX1 CardY1 CardX2 CardY2 ]; 
 
     % Draw Card if not Question
-    if CueText != '?' 
+    if (strcmp(CueText, '?'))
+        %Save Old Text Size (Monkey Coding)
+	    oldTextSize = Screen('TextSize', WSS);
+
+	    %Set Text Size
+	    Screen('TextSize', WSS, (oldTextSize*3));
+
+	    % Display Text
+            DrawFormattedText(WSS, CueText, 'center', 'center', 0, 45);
+
+	    % Set back Old Text Size
+	    Screen('TextSize', WSS, oldTextSize);
+    else
+
         % Display Image Screen
         Screen('FillRect', WSS, Color, Dest);
 
         % Display Text
         DrawFormattedText(WSS, CueText, 'center', 'center', 0, 45);
-    else
-	%Save Old Text Size (Monkey Coding)
-	oldTextSize = Screen('TextSize', WSS);
-
-	%Set Text Size
-	Screen('TextSize', WSS, (oldTextSize*2));
-
-	% Display Text
-        DrawFormattedText(WSS, CueText, 'center', 'center', 0, 45);
-
-	% Set back Old Text Size
-	Screen('TextSize', WSS, oldTextSize);
-
-    end
+	end
     
     % Record Timing
     if Flip == 1

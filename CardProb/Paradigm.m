@@ -15,7 +15,6 @@ function [ VAT ] = ParadigmJitter(BlockNumber, Params, ...
 %   
 %******************************************************************
 %
-%
 % Written by Cameron Rodriguez
 %   2012/02/08
 % Refractor by Andrew Cho
@@ -190,12 +189,28 @@ function [ VAT ] = DrawCard(WSS, ScreenSize, ...
         (ScreenSize(2)/2*CardRatio*CardSize); 
 
     Dest = [ CardX1 CardY1 CardX2 CardY2 ]; 
-    
-    % Display Image Screen
-    Screen('FillRect', WSS, Color, Dest);
 
-    % Display Text
-    DrawFormattedText(WSS, CueText, 'center', 'center', 0, 45);
+    % Draw Card if not Question
+    if CueText != '?' 
+        % Display Image Screen
+        Screen('FillRect', WSS, Color, Dest);
+
+        % Display Text
+        DrawFormattedText(WSS, CueText, 'center', 'center', 0, 45);
+    else
+	%Save Old Text Size (Monkey Coding)
+	oldTextSize = Screen('TextSize', WSS);
+
+	%Set Text Size
+	Screen('TextSize', WSS, (oldTextSize*2));
+
+	% Display Text
+        DrawFormattedText(WSS, CueText, 'center', 'center', 0, 45);
+
+	% Set back Old Text Size
+	Screen('TextSize', WSS, oldTextSize);
+
+    end
     
     % Record Timing
     if Flip == 1

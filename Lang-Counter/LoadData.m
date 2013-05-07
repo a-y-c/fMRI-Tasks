@@ -33,24 +33,24 @@ ImageDir = 'Perception';
 %%%%%%%%%%%
 %Task Blocks
 Task{1}.CBlocksTotal = 4;
-Task{1}.CBlocks = [ 1 2 3 4 ];
+Task{1}.CBlocks = [ 3 4 1 2 ];
 Task{1}.PBlocksTotal = 4;
-Task{1}.PBlocks = [ 5 6 7 8 ];
+Task{1}.PBlocks = [ 7 8 5 6 ];
 
 Task{2}.CBlocksTotal = 0;
 Task{2}.CBlocks = [ ];
 Task{2}.PBlocksTotal = 4;
-Task{2}.PBlocks = [ 1 3 4 6 ];
+Task{2}.PBlocks = [ 4 6 1 3 ];
 
 Task{3}.CBlocksTotal = 4;
-Task{3}.CBlocks = [ 1 2 3 4 ];
+Task{3}.CBlocks = [ 3 4 1 2 ];
 Task{3}.PBlocksTotal = 4;
-Task{3}.PBlocks = [ 5 6 7 8 ];
+Task{3}.PBlocks = [ 7 8 5 6 ];
 
 Task{4}.CBlocksTotal = 4;
-Task{4}.CBlocks = [ 1 2 3 4 ];
+Task{4}.CBlocks = [ 2 1 4 3 ];
 Task{4}.PBlocksTotal = 4;
-Task{4}.PBlocks = [ 5 6 7 8 ];
+Task{4}.PBlocks = [ 6 5 8 7 ];
 
 %Timing for Task
 %% Timing for Task1

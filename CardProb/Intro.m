@@ -19,7 +19,7 @@ function Intro(ScreenHandels)
 %******************************************************************
 
 
-IntroText = 'In this task, you will be presented with different cues along with a card.\n You are to guess if the card is a high card (Greater than 5) or a low card (Less than 5) based on the cue.\n\n Each cue represents a different probability so try your best to pay attention to the cues presented in order to guess the correct probability.'
+IntroText = 'In this task, you will be presented with different cues along with a card.\n You are to guess if the card is a high card (Greater than 5) or a low card (Less than 5) based on the cue.\n\n Each cue represents a different probability so try your best to pay attention to the cues presented in order to guess the correct probability.\n\n Press any button to continue.'
 
 %% Unpack Stucts
 WES = ScreenHandels.WES;   % Window Handel Experimenter

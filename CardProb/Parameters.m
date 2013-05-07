@@ -129,8 +129,8 @@ Params.Feedback.PosH = 2/3;
 Params.Feedback.PosSpace = 1/28;
 Params.Feedback.RewardColor = [ 0 128 0 ]; %Green
 Params.Feedback.PunishColor = [ 255 0 0 ]; %Red
-Params.Feedback.RewardMoney = 1;
-Params.Feedback.PunishMoney = .5;
+Params.Feedback.RewardMoney = .1;
+Params.Feedback.PunishMoney = .05;
 Params.Feedback.RewardText = 'REWARD';
 Params.Feedback.PunishText = 'PUNISH';
 

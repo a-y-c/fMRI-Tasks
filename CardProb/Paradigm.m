@@ -70,6 +70,12 @@ UnorderedTrialSet = [ ONE, TWO, THREE, FOUR, FIVE ];
 Params.TrialSet = UnorderedTrialSet(ix)
 RunningTotal = Params.StartingMoney;
 
+% Create InterStimilus Timing
+FixToCue = ISIGenerator(Params.Timing.ITI2Min, ... 
+    Params.Timing.ITI2Max, Params.TotalTrials);
+
+
+
 %%%%%%%%%%%%%%
 % EXPERIMENT %
 %%%%%%%%%%%%%%
@@ -125,7 +131,7 @@ for i = 1:Params.TotalTrials
     % Fixation Point // VAT.j = -1
     MSG = Params.MSG.Fixation;
     [ VAT ] = DrawFixationPt(WSS, RSS, MSG, VAT); 
-    WaitSecs(Params.Timing.ITI2);
+    WaitSecs(FixToCue(i));
 
 
     %% Save Data
@@ -138,7 +144,7 @@ for i = 1:Params.TotalTrials
     VAT.Results{i}.Response = Response;
     VAT.Results{i}.OutCome = DisplayInfo.Text;
     VAT.Results{i}.ResponseTime = RT;
-    %VAT.Results{i}.
+    VAT.Results{i}.Jittering = FixToCue(i);
 
 % End Loop 
 end
@@ -365,13 +371,14 @@ function [ DisplayInfo, RunningTotal ] = CalcFeedback...
     end
 end 
 
-
-
-
-
-
-
-
-
-
+%% InterStimulus Timing Generator
+    % IN -> Min, Max, Total
+    % OUT -> Row
+function Time = ISIGenerator( Min, Max, Total)
+    % Create random ISI's in the interval desired
+    mu = 0.4;
+    ISIs = ((Max-Min)*exprnd(mu, 1,Total))+Min;
+    % round to the 1000th of a sec
+    Time = round(ISIs*1000)/1000;    
+end
 

@@ -1,13 +1,12 @@
-function TrialVariables = ...
-    Task3Paradigm(BlockNumber, Params, ScreenHandels, Task)
+function [  TimeStamps  TimeCodes  KeyCodes RTSec ] = ...
+    Task3Paradigm( Params, ScreenHandels, Task )
 % TrialVariables = ...
 % ExampleParadigmBlock(BlockNumber, Params, ScreenHandels)
 %******************************************************************
 %	Description:
-%		Runs TaskBlock based on given Task and BlockNumber
+%		Runs TaskBlock based on given Task 
 %
 %	Inputs:
-%		BlockNumber: is which block to run under Task
 %		Params: is Parameters of the Project
 %		ScreenHandels: is the variable for Montior output
 %		Task: is Task with all the information
@@ -29,30 +28,24 @@ function TrialVariables = ...
 %	Used By:
 %		StaglinPTB.m
 %
-% see also: StaglinPTB, ExampleParadigmJitter, ...
+%   see also: StaglinPTB, ExampleParadigmJitter, ...
 %           Activate_Screens, RealTimeAnalysis 
-% [ 0 0 1280 1024 ] Horizontal, Vertical
+%           [ 0 0 1280 1024 ] Horizontal, Vertical
 %
 %******************************************************************
 
+%------------------------------------------------------------------
+% SETUP -----------------------------------------------------------
+
 %% Activate Keyboard
-    
 KbName('UnifyKeyNames');
 FlushEvents('keyDown');
 
-space=KbName('SPACE');
-esc=KbName('ESCAPE');
-right=KbName('RightArrow');
-left=KbName('LeftArrow');
-up=KbName('UpArrow');
-down=KbName('DownArrow');
-shift=KbName('RightShift');
-
-Keys.OKKey = KbName('p');
-Keys.KillKey = KbName('k');
-Keys.TRKey1 = KbName('t'); % TR signal key
-Keys.TRKey2 = KbName('5'); % TR signal key
-Keys.TRKB = KbName('5%');  % Keyboard TR
+Keys.OKKey      = KbName('p');
+Keys.KillKey    = KbName('k');
+Keys.TRKey1     = KbName('t'); % TR signal key
+Keys.TRKey2     = KbName('5'); % TR signal key
+Keys.TRKB       = KbName('5%');  % Keyboard TR
 
 Keys.KB1 = KbName('1!');   % Keyboard 1
 Keys.KB2 = KbName('2@');   % Keyboard 1
@@ -67,27 +60,6 @@ Keys.BB4 = KbName('4');    % Button Box 4
 % Keep KbCheck for looking for the TR signals
 olddisabledkeys = DisableKeysForKbCheck([KbName('T'),KbName('5')]); 
 
-
-%% Set Experiment Data Folder location
-% Set Images
-Images      = Task.Block{BlockNumber}.Images;
-ImageNames  = Task.Block{BlockNumber}.ImageNames;
-ImageSize   = Task.Block{BlockNumber}.ImageSize;
-
-% Set Sentences
-Sentences   = Task.Block{BlockNumber}.Sentences;
-
-% Set Sound
-SoundData   = Task.Block{BlockNumber}.Sounds;
-SoundFreq   = Task.Block{BlockNumber}.SoundsFreq;
-Channel     = Task.Block{BlockNumber}.Channel;
-
-
-
-%Set Timing
-Time = Task.Timing;
-
-
 %% Unpack Stucts
 WES = ScreenHandels.WES;   % Window Handel Experimenter
 RES = ScreenHandels.RES;   % Window Rectangle Experimenter
@@ -100,454 +72,408 @@ ifiS = ScreenHandels.ifiS; % interframe interval Subject
 InitializePsychSound;
 
 %% Preallocate Variable for Speed
-TimeCodes = nan(1, 1000);
-TimeStamps = nan(1, 1000);
-KeyCodes = nan(1, 1000);
+TimeCodes = nan(1, 50);
+TimeStamps = nan(1, 50);
+KeyCodes = nan(1, 50);
+RTSec = nan(1,50);
+j = 0;
 
+%% TimeCode Intpretation
+CodeDrawText = 5;
+CodeDisplayImage = 6;
+CodeFixationPt = 7;
+CodeKeyResponse = 8;
+
+% ----------------------------------------------------------------
+% Timing Blocks --------------------------------------------------
+
+% Start Time 
+TimeBlocks(1) = 0;
+% Break 
+TimeBlocks(2) = TimeBlocks(1) + Task.Timing.InstrBreak;
+% Instructions
+TimeBlocks(3) = TimeBlocks(2) + Task.Timing.Instr;
+
+COUNTER = 3;
+% Loop for Blocks
+for j = 1:length(Task.Blocks)
+
+    % Break
+    COUNTER = COUNTER + 1;
+    TimeBlocks(COUNTER) = TimeBlocks(COUNTER - 1) ...
+        + Task.Timing.BlockBreak;
+
+    % Loop for Images
+    for i = 1:Task.BlocksTotal
+        
+        % Block Task
+        COUNTER = COUNTER + 1;
+        TimeBlocks(COUNTER) = TimeBlocks(COUNTER - 1) ...
+            + Task.Timing.TaskTime;
+    end
+end
+
+% Break
+COUNTER = COUNTER + 1;
+TimeBlocks(COUNTER) = TimeBlocks(COUNTER - 1) +  Task.Timing.BlockBreak
+
+% ----------------------------------------------------------------
+% START SCAN -----------------------------------------------------
+%%%%%%%%
+
+%% Wait for the Scan to begin
+Text = 'Waiting for MRI scan to begin...';
+DrawFormattedText(WSS, Text, 'center', 'center', 0 , 45);
+Screen('Flip',WSS);
+                    
+%% Wait for Trigger
+while KbCheck(-1); end % clear keyboard queue
+Scanning = 0;
+while Scanning ~= 1
+    [keyIsDown, TimePt, keyCode] = KbCheck(-1);
+    if ( keyCode(Keys.TRKey1) | keyCode(Keys.TRKey2) | ...
+                keyCode(Keys.TRKB) )
+        Scanning = 1; disp('Scan Has Begun');
+        StartTime = GetSecs;
+    end
+end
+
+% Keep KbCheck for looking for the TR signals
+olddisabledkeys = DisableKeysForKbCheck([KbName('T'),KbName('5')]); 
+ 
+% Start Up
+j = 1;
+TimeStamps(j) = 0;
+TimeCodes(j) = 3; % Block Begin
+KeyCodes(j) = -1; % No Key Press
+RTSec(j) = -1; % No Response Time
+
+
+% ----------------------------------------------------------------
+% INTRO ----------------------------------------------------------
+%%%%%%%%
+%% Display Instructions  in the beginning
+
+% Draw a Fixation Point onto the screen
+[ TStamp ] = DrawFixationPt(WSS, RSS);
+
+% Save Info
+j = j + 1;
+TimeStamps(j) = TStamp - StartTime;
+TimeCodes(j) = CodeFixationPt;
+KeyCodes(j) = -1;
+RTSec(j) = -1; 
+
+% Wait till Block
+WaitSecs(TimeBlocks(2) - (GetSecs - StartTime)); 
+
+% Display Instruction Task
+DisplayText = Task.Instr.Sentence;
+[ TStamp ] = DrawText(WSS, DisplayText); 
+
+% Save Info
+j = j + 1;
+TimeStamps(j) = TStamp - StartTime;
+TimeCodes(j) = CodeDrawText;
+KeyCodes(j) = -1;
+RTSec(j) = -1; 
+
+% Play Instructions
+InstrSound = Task.Instr.Sounds{1};
+InstrChannel = Task.Instr.Channel{1};
+InstrFreq = Task.Instr.SoundsFreq{1};
+% Play Sound
+[ Handel ] = PlaySound(InstrSound, InstrChannel, InstrFreq);
+
+% Wait X Seconds 
+WaitSecs(TimeBlocks(3) - (GetSecs - StartTime));
+% Close Sound Buffer
+PsychPortAudio('Stop', Handel); 
+
+% ----------------------------------------------------------------
+%% START TASK ----------------------------------------------------
+%%%%%%%
+% Count Loops
+loopCounter = 3;
 %% Run The Experiment Based on which block it is
-TI = zeros(size(Images));% Texture index
+for BlockNumber = Task.Blocks 
+ 
+% ----------------------------------------------------------------
+% Rest Period ----------------------------------------------------
+%%%%%%%
+    % Draw a Fixation Point onto the screen
+    [ TStamp ] = DrawFixationPt(WSS, RSS);
+    % Save Info
+    j = j + 1;
+    TimeStamps(j) = TStamp - StartTime;
+    TimeCodes(j) = CodeFixationPt;
+    KeyCodes(j) = -1;
+    RTSec(j) = -1; 
 
-TimeStamps(1) = GetSecs;
-TimeCodes(1) = 3; % Block Begin
-KeyCodes(1) = -1; % No Key Press
+% ----------------------------------------------------------------
+%% SETUP TASK ----------------------------------------------------
+%%%%%%%
+    % Texture Index
+    TI = zeros(size(Task.Block{BlockNumber}.Images));
+    
+    % Make Textures for Images
+    for i = 1:size(Task.Block{BlockNumber}.Images,2)
+        TI(i)=Screen('MakeTexture', WSS, ...
+            Task.Block{BlockNumber}.Images{i});
+    end
+ 
+     
+% ----------------------------------------------------------------
+% Start Block ----------------------------------------------------
+%%%%%%%
+    %% Draw the Textures
+    for i = 1:size(Task.Block{BlockNumber}.Images,2)/2 
 
-% Make Textures for Images
-for i = 1:size(Images,2)
-    TI(i)=Screen('MakeTexture', WSS, Images{i});
+        % Wait time in Seconds
+        loopCounter = loopCounter +1;
+    
+        % Draw Image
+        [ TStamp ] = ...
+            DrawImageDual(WSS, TI(2*i - 1), TI(2*i), ...
+                Task.Block{BlockNumber}.ImageSize{2*i-1}, ...
+                Task.Block{BlockNumber}.ImageSize{2*i}, ...
+                Params.ScreenSize, 0, TimeBlocks(loopCounter)+StartTime);
+        % Save Info
+        j = j + 1;
+        TimeStamps(j) = TStamp - StartTime;
+        TimeCodes(j) = CodeDisplayImage;
+        KeyCodes(j) = -1;
+        RTSec(j) = -1; 
+
+    	% Play Sound Sentence
+     	[ Handel ] = PlaySound(Task.Block{BlockNumber}.Sounds{i},...
+                Task.Block{BlockNumber}.Channel{i}, ...
+                Task.Block{BlockNumber}.SoundsFreq{i});
+        % Wait for Sound
+        WaitSecs(Task.Timing.Audio);
+
+        % Get a Key Press
+        [ TStamp, KCode, RT ] = GetKeyPressWithTimeOut(...
+            Keys, Task.Timing.Response);
+        % Save Info
+        j = j + 1;
+        TimeStamps(j) = TStamp - StartTime;
+        TimeCodes(j) = CodeKeyResponse;
+        KeyCodes(j) = KCode;
+        RTSec(j) = RT;
+        
+        PsychPortAudio('Stop', Handel); % Close Sound Buffer
+
+   end
+    % Finish Block
+    Screen('Close', TI); % Close the Open Textures
+    
+    % Wait time in Seconds 
+    loopCounter = loopCounter +1;
+    WaitSecs(TimeBlocks(loopCounter) - (GetSecs - StartTime)); 
+
 end
 
-switch BlockNumber
-    % Active vs. Passive Voice, Comprehension
-    case { 1, 2, 3, 4 }
-        j = 2;% Set inital point for counter
+% -----------------------------------------------------------------
+% Finish Up -------------------------------------------------------
+%%%%%%%%%%%
+% Draw a Fixation Point onto the screen
+DrawFixationPt(WSS, RSS);
 
-        %% Display Instructions only if First Block
-        if ( BlockNumber == 1 )
-            % Transition Slides
-            [TimeStamps, TimeCodes, KeyCodes, j] = ...
-                DrawFixationPt(WSS, RSS, TimeStamps, ...
-                        TimeCodes, KeyCodes, j);
-            WaitSecs(Time.InstrCompBreak);
+% Save Info
+j = j + 1;
+TimeStamps(j) = GetSecs - StartTime;
+TimeCodes(j) = CodeDisplayImage;
+KeyCodes(j) = -1;
+RTSec(j) = -1; 
+ 
+% Close Sound Option
+PsychPortAudio('Close', Handel); 
 
-            DisplayText = Task.Instr.Comp
-            [TimeStamps, TimeCodes, KeyCodes, j] = ... 
-                DrawText(WSS, DisplayText, TimeStamps, ... 
-                TimeCodes, KeyCodes, j); 
+% Wait time in Seconds
+loopCounter = loopCounter + 1;
+WaitSecs(TimeBlocks(loopCounter) - (GetSecs - StartTime));
 
-            % Play Instructions
-            InstrSound = Task.Instr.Sounds{1};
-            InstrChannel = Task.Instr.Channel{1};
-            InstrFreq = Task.Instr.SoundsFreq{1};
-            [ Handel ] = PlaySound(InstrSound, InstrChannel, ...
-                    InstrFreq);
+ 
+% -----------------------------------------------------------------
+% Clean Up --------------------------------------------------------
+%%%%%%%%%%%
 
-            % Wait X Seconds 
-            WaitSecs(Time.InstrComp);
-            % Close Sound Buffer
-            PsychPortAudio('Stop', Handel); 
-
-        end
-        
-        %% Draw the Textures
-        for i = 1:size(Images,2)/2 
-            % Draw Image
-            [TimeStamps, TimeCodes, KeyCodes, j] = ...
-                DrawImageDual(WSS, TI(2*i - 1), TI(2*i), TimeStamps, ...
-                TimeCodes, KeyCodes, j, ImageSize{2*i-1}, ...
-                ImageSize{2*i}, Params.ScreenSize, 0);
-                %char(Sentences(i))
-                
-	    	% Play Sound Sentence
-	    	[ Handel ] = PlaySound(SoundData{i}, Channel{i}, SoundFreq{i});
-            WaitSecs(Time.AudioComp);
-
-            %Get a get Press
-            [TimeStamps, TimeCodes, KeyCodes, j, RT] = ...
-                GetKeyPressWithTimeOut(Keys, TimeStamps, ...
-                            TimeCodes, KeyCodes, j, Time.ResponseComp);
-            
-            % Wait time in Seconds 
-            WaitSecs(Time.ResponseComp - RT); 
-            PsychPortAudio('Stop', Handel); % Close Sound Buffer
-
-            % Skip on the last round
-            if i ~= size(Images,2) 
-                % Draw a Fixation Point onto the screen
-                [TimeStamps, TimeCodes, KeyCodes, j] = ...
-                    DrawFixationPt(WSS, RSS, TimeStamps, ...
-                                   TimeCodes, KeyCodes, j);
-                WaitSecs(Time.StimBreak); % Wait time in Seconds
-            end
-            % Finish One Stimilus
-        end
-        % Finish Block
-        Screen('Close', TI); % Close the Open Textures
-        PsychPortAudio('Close', Handel); 
-        
-
-    % Future vs. Irregular Past, Production
-    case { 5, 6, 7, 8 }
-        j = 2;% Set inital point for counter
-        
-        % Box
-        ColorBox = Task.ColorBox;
-        ImageBox = Task.Block{BlockNumber}.ImageBox;
-        PixelBox = Task.PixelBox;
-        LeftBox = Task.Block{BlockNumber}.LeftBox;
-        
-        %% Display Instructions only if First Block
-        if ( BlockNumber == 5 )
-            % Transition Slides
-            [TimeStamps, TimeCodes, KeyCodes, j] = ...
-                DrawFixationPt(WSS, RSS, TimeStamps, ...
-                        TimeCodes, KeyCodes, j);
-            WaitSecs(Time.InstrProBreak);
-
-            DisplayText = Task.Instr.Pro
-            [TimeStamps, TimeCodes, KeyCodes, j] = ... 
-                DrawText(WSS, DisplayText, TimeStamps, ... 
-                TimeCodes, KeyCodes, j); 
-
-            % Play Instructions
-            InstrSound = Task.Instr.Sounds{Task.Instr.ProChoice+1};
-            InstrChannel = Task.Instr.Channel{Task.Instr.ProChoice+1};
-            InstrFreq = Task.Instr.SoundsFreq{Task.Instr.ProChoice+1};
-            [ Handel ] = PlaySound(InstrSound, InstrChannel, ...
-                    InstrFreq);
-
-            % Wait X Seconds 
-            WaitSecs(Time.InstrPro);
-            % Close Sound Buffer
-            PsychPortAudio('Stop', Handel); 
-
-        end
-
-        %% Draw the Textures  
-        for i = 1:size(Images,2)/2 
-            % Draw Image
-            [TimeStamps, TimeCodes, KeyCodes, j] = ...
-                DrawImageDual(WSS, TI(2*i - 1), TI(2*i), TimeStamps, ...
-                TimeCodes, KeyCodes, j, ImageSize{2*i-1}, ...
-                ImageSize{2*i}, Params.ScreenSize, 0);
-                %char(Sentences(i))
-
-	    	% Play Sound Sentence
-	    	[ Handel ] = PlaySound(SoundData{i}, Channel{i}, SoundFreq{i});
-
-	    	% Delay/Wait for BUT/Words
-            WaitSecs(4); 
-
-            % Draw an Red Box onto the screen
-            Box.Color = ColorBox;
-            Box.Image = ImageBox{i};
-            Box.Pixel = PixelBox;
-            Box.Left = LeftBox{i};
-            
-            [TimeStamps, TimeCodes, KeyCodes, j] = ...
-                DrawImageDualRed(WSS, TI(2*i - 1), TI(2*i), TimeStamps, ...
-                TimeCodes, KeyCodes, j, ImageSize{2*i-1}, ...
-                ImageSize{2*i}, Params.ScreenSize, Box);
-
-            
- 	    	% Wait for Response
-            WaitSecs(Time.AudioPro - 4 + Time.ResponsePro);
-            PsychPortAudio('Stop', Handel); % Close Sound Buffer
-
-            % Skip on the last round
-            if i ~= size(Images,2) 
-                % Draw a Fixation Point onto the screen
-                [TimeStamps, TimeCodes, KeyCodes, j] = ...
-                    DrawFixationPt(WSS, RSS, TimeStamps, ...
-                                   TimeCodes, KeyCodes, j);
-
-            % Finish/Close
-           	WaitSecs(Time.StimBreak); % Wait time in Seconds
-            end
-
-        end
-        Screen('Close', TI); % Close the Open Textures
-        PsychPortAudio('Close', Handel); 
-        
-    otherwise
-    % etc ...
-	    % Draw an Image onto the screen
-            % [TimeStamps, TimeCodes, KeyCodes, j] = ...
-            %    DrawImageCenter(WSS, TI(i), TimeStamps, ...
-            %            TimeCodes, KeyCodes, j, ... 
-            %            ImageSize{i}, Params.ScreenSize, ...
-            %            char(Sentences(1)) );
-end
-
-
-TimeStamps(find(isnan(TimeStamps),1)) = GetSecs;
+TimeStamps(find(isnan(TimeStamps),1)) = (GetSecs - StartTime);
 TimeCodes(find(isnan(TimeCodes),1)) = 4; % Block Ends
 KeyCodes(find(isnan(KeyCodes),1)) = -1;
+RTSec(find(isnan(TimeCodes),1)) = 0; % Block Ends
 
 %% Trim off the excess and pack in a stuct to pass out
 TimeStamps(isnan(TimeStamps)) = []; 
 TimeCodes(isnan(TimeCodes)) = [];
 KeyCodes(isnan(KeyCodes)) = [];
-
-TrialVariables.TimeStamps = TimeStamps;
-TrialVariables.TScode = TimeCodes;
-TrialVariables.KeyCodes = KeyCodes;
-TrialVariables.POrder = [];
-end
-
-%% Subfunctions
-
-function [TimeStamps, TimeCodes, KeyCodes, j] = ...
-    DrawText(WSS, DisplayText, TimeStamps, TimeCodes, KeyCodes, j)
-
-% Draw / Display Text            
-DrawFormattedText(WSS, DisplayText,  'center', 'center', 0 , 45);
-TimeStamps(j) = Screen('Flip',WSS);
-KeyCodes(j) = -1;
-TimeCodes(j) = 5;
-j = j+1; % Advance Counter
-end
-
-function [TimeStamps, TimeCodes, KeyCodes, j] = ...
-    DrawImage(WSS, Image, TimeStamps, TimeCodes, KeyCodes, j)
-
-% Draw / Display Image            
-Screen('DrawTexture', WSS, Image, [0 0 640 512] );
-TimeStamps(j) = Screen('Flip',WSS);
-TimeCodes(j) = 6;
-KeyCodes(j) = -1;
-j = j+1; % Advance Counter
+RTSec(isnan(RTSec)) = [];
 end
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% DRAW Dual IMAGE WITH RED BOX %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [TimeStamps, TimeCodes, KeyCodes, j] = ...
-    DrawImageDualRed(WSS, Image1, Image2, TimeStamps, TimeCodes, ...
-        KeyCodes, j, Image1Size, Image2Size, ScreenSize, Box)
 
-% Draw / Display Image            
-SCenter = ScreenSize / 2;
-SourceD1Image = [0 0 Image1Size(2) Image1Size(1)];
-SourceD2Image = [0 0 Image2Size(2) Image2Size(1)];
-%%%%%%%%%%%%%%%%%%%%%%%%
-% CHANGE MAX SIZE HERE %
-%%%%%%%%%%%%%%%%%%%%%%%%
-% Set Image Max Size
-RATIO = 1/16;
-if ScreenSize(1) < ScreenSize(2)
-    X = (ScreenSize(2) - ScreenSize(2)*RATIO)/2;
-    Y = X;
-else
-    Y = (ScreenSize(1) - ScreenSize(1)*RATIO)/2;
-    X = Y;
+
+
+
+
+% ----------------------------------------------------------------- 
+%% Subfunctions ---------------------------------------------------
+%%%%%
+
+% PLAY SOUND
+% ----------
+function [ SoundHandel ] = PlaySound( SoundData, Channel, SoundFreq )
+    SoundHandel = PsychPortAudio('Open', [], [], 0, SoundFreq, Channel);
+    PsychPortAudio('FillBuffer', SoundHandel, SoundData');
+    StartMusic = PsychPortAudio('Start', SoundHandel, 1, 0, 1);
 end
 
-% Calculate Resizing 
-[X1 Y1] = Cize(X, Y,  Image1Size(2),  Image1Size(1));
-[X2 Y2] = Cize(X, Y,  Image2Size(2),  Image2Size(1));
 
+% Draw Text
+% ---------
+function [ TStamp ] = DrawText(WSS, DisplayText)
+    % Draw / Display Text            
+    DrawFormattedText(WSS, DisplayText, 'center', 'center', 0 , 45);
+    TStamp = Screen('Flip',WSS);
+end
 
-%% Image Destination
-DestD1Image = Fsize( SCenter, X1, Y1, 0, 1 );
-DestD2Image = Fsize( SCenter, X2, Y2, 0, 3 );
+% Draw Fixation
+% -------------
+function [ TStamp ] = DrawFixationPt(WSS, RSS)
 
-if Box.Left == 1
-    BoxO = X1 / Image1Size(2) * Box.Image;
-    BX1 = BoxO(1) + DestD1Image(1);
-    BY1 = BoxO(2) + DestD1Image(2);
-    BX2 = BoxO(3) + DestD1Image(1);
-    BY2 = BoxO(4) + DestD1Image(2);
+    % Draw / Display Fixation Point              
+    Screen('FillRect', WSS, 128, RSS);
+    Screen('DrawDots', WSS, [0, 0], 10, 255*[1 0 0 1], ...
+           [RSS(3)/2 RSS(4)/2], 1);
+    Screen('DrawingFinished', WSS);
+    TStamp = Screen('Flip',WSS);
+end
+
+% Draw Dual Image
+% ---------------
+function [ TStamp ] = DrawImageDual( ...
+        WSS, Image1, Image2, Image1Size, Image2Size, ScreenSize, LEFT, TIME)
+
+    % Draw / Display Image            
+    SCenter = ScreenSize / 2;
+    SourceD1Image = [0 0 Image1Size(2) Image1Size(1)];
+    SourceD2Image = [0 0 Image2Size(2) Image2Size(1)];
+    %%%%%%%%%%%%%%%%%%%%%%%%
+    % CHANGE MAX SIZE HERE %
+    %%%%%%%%%%%%%%%%%%%%%%%%
+    % Set Image Max Size
+    RATIO = 1/16;
     
-    DestBoxImage = [ BX1 BY1 BX2 BY2];
-else
-    BoxO = X2 / Image2Size(2) * Box.Image;
-    BX1 = BoxO(1) + DestD2Image(1);
-    BY1 = BoxO(2) + DestD2Image(2);
-    BX2 = BoxO(3) + DestD2Image(1);
-    BY2 = BoxO(4) + DestD2Image(2);
+    if ScreenSize(1) < ScreenSize(2)
+        X = (ScreenSize(2) - ScreenSize(2)*RATIO)/2;
+        Y = X;
+    else
+        Y = (ScreenSize(1) - ScreenSize(1)*RATIO)/2;
+        X = Y;
+    end
     
-    DestBoxImage = [ BX1 BY1 BX2 BY2]; 
-end
-
-% Draw White Background Image
-DestD1White = Fsize( SCenter, X, Y, 0, 1 );
-DestD2White = Fsize( SCenter, X, Y, 0, 3 );
-white = WhiteIndex(WSS);
-Screen('FillRect', WSS, white, DestD1White );
-
-% Draw Image on Top
-Screen('DrawTexture', WSS, Image1, SourceD1Image, DestD1Image);
-Screen('FillRect', WSS, white, DestD2White );
-Screen('DrawTexture', WSS, Image2, SourceD2Image, DestD2Image);
-Screen('FrameRect', WSS, Box.Color, DestBoxImage, Box.Pixel );
-
-% Display Text
-%DrawFormattedText(WSS, DisplayText,  'center', SCenter(1) - 450, 0 , 45);
-
-TimeStamps(j) = Screen('Flip',WSS);
-TimeCodes(j) = 6;
-KeyCodes(j) = -1;
-j = j+1; % Advance Counter
-end
-
-%%%%%%%%%%%%%%%%%%%%%
-%%% DRAW Dual IMAGE %
-%%%%%%%%%%%%%%%%%%%%%
-function [TimeStamps, TimeCodes, KeyCodes, j] = ...
-    DrawImageDual(WSS, Image1, Image2, TimeStamps, TimeCodes, KeyCodes, ...
-        j, Image1Size, Image2Size, ScreenSize, LEFT)
-
-% Draw / Display Image            
-SCenter = ScreenSize / 2;
-SourceD1Image = [0 0 Image1Size(2) Image1Size(1)];
-SourceD2Image = [0 0 Image2Size(2) Image2Size(1)];
-%%%%%%%%%%%%%%%%%%%%%%%%
-% CHANGE MAX SIZE HERE %
-%%%%%%%%%%%%%%%%%%%%%%%%
-% Set Image Max Size
-RATIO = 1/16;
-if ScreenSize(1) < ScreenSize(2)
-    X = (ScreenSize(2) - ScreenSize(2)*RATIO)/2;
-    Y = X;
-else
-    Y = (ScreenSize(1) - ScreenSize(1)*RATIO)/2;
-    X = Y;
-end
-
-% Calculate Resizing 
-[X1 Y1] = Cize(X, Y,  Image1Size(2),  Image1Size(1));
-[X2 Y2] = Cize(X, Y,  Image2Size(2),  Image2Size(1));
-
-%% Image Destination
-DestD1Image = Fsize( SCenter, X1, Y1, 0, 1 );
-DestD2Image = Fsize( SCenter, X2, Y2, 0, 3 );
-
-% Draw White Background Image
-DestD1White = Fsize( SCenter, X, Y, 0, 1 );
-DestD2White = Fsize( SCenter, X, Y, 0, 3 );
-white = WhiteIndex(WSS);
-Screen('FillRect', WSS, white, DestD1White );
-% Draw Image on Top
-Screen('DrawTexture', WSS, Image1, SourceD1Image, DestD1Image);
-if LEFT == 0
-    Screen('FillRect', WSS, white, DestD2White );
-    Screen('DrawTexture', WSS, Image2, SourceD2Image, DestD2Image);
-end
-
-% Display Text
-%DrawFormattedText(WSS, DisplayText,  'center', SCenter(1) - 450, 0 , 45);
-
-TimeStamps(j) = Screen('Flip',WSS);
-TimeCodes(j) = 6;
-KeyCodes(j) = -1;
-j = j+1; % Advance Counter
+    % Calculate Resizing 
+    [X1 Y1] = Cize(X, Y,  Image1Size(2),  Image1Size(1));
+    [X2 Y2] = Cize(X, Y,  Image2Size(2),  Image2Size(1));
+    
+    %% Image Destination
+    DestD1Image = Fsize( SCenter, X1, Y1, 0, 1 );
+    DestD2Image = Fsize( SCenter, X2, Y2, 0, 3 );
+    
+    % Draw White Background Image
+    DestD1White = Fsize( SCenter, X, Y, 0, 1 );
+    DestD2White = Fsize( SCenter, X, Y, 0, 3 );
+    white = WhiteIndex(WSS);
+    Screen('FillRect', WSS, white, DestD1White );
+    
+    % Draw Image on Top
+    Screen('DrawTexture', WSS, Image1, SourceD1Image, DestD1Image);
+    if LEFT == 0
+        Screen('FillRect', WSS, white, DestD2White );
+        Screen('DrawTexture', WSS, Image2, SourceD2Image, DestD2Image);
+    end
+    
+    TStamp = Screen('Flip',WSS, TIME);
 end
 
 %% Help Calculate Frame Size
 function [XO YO] = Cize(RX, RY, X, Y)
-if (X > Y)
-	YO = RX / X * Y;
-	XO = RX;
-else
-	XO = RY / Y * X;
-	YO = RY;
-end
+    if (X > Y)
+    	YO = RX / X * Y;
+    	XO = RX;
+    else
+    	XO = RY / Y * X;
+    	YO = RY;
+    end
 end
 
 %% Help Calculate Screen Frame Size
 function [ DestImage ] = Fsize( SCenter, X, Y, OFF, Mult)
-X1 = SCenter(1)*Mult/2 - (X)/2;
-Y1 = SCenter(2) - (Y)/2 + OFF;
-Y2 = SCenter(2) + (Y)/2 + OFF;
-X2 = SCenter(1)*Mult/2 + (X)/2;
-DestImage = [ X1 Y1 X2 Y2 ] ;
+    X1 = SCenter(1)*Mult/2 - (X)/2;
+    Y1 = SCenter(2) - (Y)/2 + OFF;
+    Y2 = SCenter(2) + (Y)/2 + OFF;
+    X2 = SCenter(1)*Mult/2 + (X)/2;
+    DestImage = [ X1 Y1 X2 Y2 ] ;
 end
 
+% Get Key Press
+% -------------
+function [ TStamp, KCode, RT ] = GetKeyPressWithTimeOut(Keys, maxTime)
 
-%% PLAY SOUND
-function [ SoundHandel ] = PlaySound( SoundData, Channel, SoundFreq )
-SoundHandel = PsychPortAudio('Open', [], [], 0, SoundFreq, Channel);
-PsychPortAudio('FillBuffer', SoundHandel, SoundData');
-StartMusic = PsychPortAudio('Start', SoundHandel, 1, 0, 1);
-end
+    % Record Time
+    BaseTime = GetSecs;
+    % Default KCode
+    KCode = 0;
 
-function [TimeStamps, TimeCodes, KeyCodes, j] = ...
-    DrawFixationPt(WSS, RSS, TimeStamps, TimeCodes, KeyCodes, j)
+    % For Loop
+    Escape = false;
+    while ~Escape
+        % While no key Pressed, Wait, Check Again
+    	if( GetSecs-BaseTime > maxTime )
+            secs = BaseTime + maxTime;
+            
+            % Outputs
+            RT = maxTime;
+            TStamp = secs;
+            KCode = 0;
+            return;
+        end
+        WaitSecs(0.001);
+    
+        % Key is Down! Retrieve the Key and RT
+        keyIsDown = 0;
+        [keyIsDown, secs, keyCode] = KbCheck(-1);
+        if ( keyIsDown == 1 )
+            if (keyCode(Keys.BB1) | keyCode(Keys.KB1))
+                KCode = 1;
+                Escape = true;
+            elseif (keyCode(Keys.BB2) | keyCode(Keys.KB2))
+                KCode = 2;
+                Escape = true;
+            elseif (keyCode(Keys.BB3) | keyCode(Keys.KB3))
+                KCode = 3;
+                Escape = true;
+            elseif (keyCode(Keys.BB4) | keyCode(Keys.KB4))
+                KCode = 4; 
+                Escape = true;
 
-% Draw / Display Fixation Point              
-Screen('FillRect', WSS, 128, RSS);
-Screen('DrawDots', WSS, [0, 0], 10, 255*[1 0 0 1], ...
-       [RSS(3)/2 RSS(4)/2], 1);
-Screen('DrawingFinished', WSS);
-TimeStamps(j) = Screen('Flip',WSS);
-KeyCodes(j) = -1;
-TimeCodes(j) = 7;
-j = j+1; % Advance Counter
-end
-
-function [TimeStamps, TimeCodes, KeyCodes, j] = ...
-    GetKeyPress(Keys, TimeStamps, TimeCodes, KeyCodes, j)
-
-% Wait For Key Press / Get Responce            
-keyIsDown=0;
-while keyIsDown == 0
-    [keyIsDown, KeyPressTime, keyCode] = KbCheck(-1);
-    if keyIsDown == 1
-       if (keyCode(Keys.TRKey1) | ...
-           keyCode(Keys.TRKey2) | ...
-           keyCode(Keys.TRKB))
-           keyIsDown = 0;
-       end
-    end
-end
-while KbCheck(-1); end % clear keyboard queue
-TimeStamps(j) = KeyPressTime;
-KeyCodes(j) = find(keyCode,1);
-TimeCodes(j) = 8;
-j = j+1; % Advance Counter
-end
-
-function [TimeStamps, TimeCodes, KeyCodes, j, RT] = ...
-    GetKeyPressWithTimeOut(Keys, TimeStamps, TimeCodes, KeyCodes, ...
-        j, maxTime)
-
-baseTime = GetSecs;
-gotgood = false;
-
-while ~gotgood
-    % while no key is pressed, wait a bit, then check again
-	if( GetSecs-baseTime > maxTime )
-    	secs = baseTime + maxTime;
-        RT = maxTime;
-        key = 'T'; % Capitalized
-        return;
-    end
-    WaitSecs(0.001);
-
-    % got here? a key is down! retrieve the key and RT
-    keyIsDown = 0;
-    [keyIsDown, secs, keyCode] = KbCheck(-1);
-    if keyIsDown == 1
-       if (keyCode(Keys.TRKey1) | ... 
-           keyCode(Keys.TRKey2) | ... 
-           keyCode(Keys.TRKB))
-           keyIsDown = 0;
-        else
-            gotgood = true;
+            % Not a Valid Key
+            else
+                keyIsDown = 0;
+            end 
         end 
-    end 
-end
-    RT = secs-baseTime;
+    end
 
-    % do not pass control back until the key has been released
-	while KbCheck(-1)
-    	WaitSecs(0.001);
-  	end
+    % Calculate Response Time
+    RT = secs - BaseTime
 
-    TimeStamps(j) = secs;
-    KeyCodes(j) = find(keyCode,1);
-    TimeCodes(j) = 8;
-    j = j+1; % Advance Counter
+    % Wait till Key is Release
+    while KbCheck(-1)
+        WaitSecs(0.001);
+    end
+
+    % Record Seconds
+    TStamp = secs;
 end
 

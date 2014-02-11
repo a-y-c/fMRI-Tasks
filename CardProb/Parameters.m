@@ -94,6 +94,10 @@ Params.Timing.Outcome   = 1.25;
 Params.Timing.Feedback  = 1.25;
 Params.Timing.ITI2      = 1;
 
+%% Interstimiulus Timing
+Params.Timing.ITI2Min   = 0.5;
+Params.Timing.ITI2Max   = 4;
+
 % Cue Data
 Params.TotalCue1 = 15;
 Params.TotalCue2 = 15;
@@ -141,5 +145,4 @@ Params.MSG.QuestionCue = 'Draw Question Cue';
 Params.MSG.RecordInput = 'Record Input';
 Params.MSG.OutComeCue = 'Draw Outcome Cue';
 Params.MSG.Feedback = 'Draw Feedback';
-
 

@@ -1,4 +1,4 @@
-function Params = Parameters(TestMode, TestSubject, TaskNumber, Params )
+function Params = Parameters(TestMode, TestSubject, TaskNumber, BlockChoice)
 %
 %******************************************************************
 %
@@ -31,9 +31,10 @@ function Params = Parameters(TestMode, TestSubject, TaskNumber, Params )
 % Description %
 %%%%%%%%%%%%%%%
 Params.LabGroup = 'SBOOK';
-Params.ExperimentName = 'fMRI-Lang_V.2';
+% FMRI Language Test
+Params.ExperimentName = 'fMRI-Lang';
 Params.ExperimentPurpose = 'Language Comprehension and Production';
-Params.ExperimentTask = '4 Blocks at 195 Seconds';
+Params.ExperimentTask = 'Execute Block and Jitter Designs';
 Params.TestSubject = TestSubject;
 
 % Design
@@ -134,7 +135,7 @@ end
 Params.Filename  = [ Params.ExperimentName, '_', ...
             datestr(now,'yyyymmdd_HHMMSS'), 'Task', ...
             num2str(TaskNumber), ...
-            '_Subject_', TestSubject];
+            BlockChoice, '_Subject_', TestSubject];
 
 
 switch Params.LabGroup

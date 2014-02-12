@@ -30,9 +30,8 @@ function StaglinPTB(TestSubject)
 %           Activate_Screens, RealTimeAnalysis 
 %
 %******************************************************************
-
-%%%%%%%%% ---------------------------------------------------------
-% SETUP % ---------------------------------------------------------
+%%%%%%%%%
+% SETUP %
 %%%%%%%%%
 %% Who is the Subject ?
 if nargin < 1
@@ -46,7 +45,7 @@ else
     TestMode = 0;
 end
 
-%%%%%%%%%%%%%%%%%%%%
+
 %% Activate Keyboard
 KbName('UnifyKeyNames');
 FlushEvents('keyDown');
@@ -69,17 +68,28 @@ KB4 = KbName('4$');   % Keyboard 4
 %  HID Key 12345   %
 %%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%
+
 BB1 = KbName('1');    % Button Box 1 (Blue Key)
 BB2 = KbName('2');    % Button Box 2 (Yellow Key)
 BB3 = KbName('3');    % Button Box 3 (Green Key)
 BB4 = KbName('4');    % Button Box 4 (Red Key)
 
+% Code to be used to later on diable the MRI TR trigger Keys
+% olddisabledkeys=DisableKeysForKbCheck([KbName('T'), KbName('5')])
+
+% Code to be used to later on restore the MRI TR trigger Keys
+% olddisabledkeys=DisableKeysForKbCheck([])
+
+%% Initialize the random stream
+%RandStream.setDefaultStream(...
+%                    RandStream('mt19937ar','seed',sum(100*clock)));
 
 
 %%%%%%%%%%%%%%%%%%
 %% Open Screens %
 %%%%%%%%%%%%%%%%%
-[ScreenHandels, Screen_Parameters, PPD_DPP] = Activate_Screens;
+[ScreenHandels, Screen_Parameters, PPD_DPP] = ...
+    Activate_Screens;
 WES = ScreenHandels.WES; % Window Handel Right Screen
 RES = ScreenHandels.RES; % Window Rectangle Right Screen
 WSS = ScreenHandels.WSS; % Window Handel Left Screen
@@ -98,103 +108,132 @@ Escape = false;
 while (~Escape)
 
     % Retrieve Scan Information from User Input
-    [ TaskNumber ] = GetTaskNumber( WSS, RSS, Params.ScreenCenter ); 
+    [ TaskNumber BlockChoice ] = GetCommand( WSS, RSS ); 
 
     % If Quit Button was Hit
     if TaskNumber == 0
         %% Do some clean up
         Screen('CloseAll'); % Close PTB windows
         ShowCursor;   
-
         % CLEAR EVERYTHING
         clear all
-        % Display All Clear Sign / Finish
-        disp('ALL DONE')
-        return
+        exit;
     end  
 
-    %% Wait for the Scan to begin
-    Text = 'Loading Task ...';
-    DrawFormattedText(WSS, Text, 'center', 'center', 0 , 45);
-    Screen('Flip',WSS);
-
-    %% Fill in Parameters
-    Params = Parameters(TestMode, TestSubject, TaskNumber, Params);
-    % Load Data
+    
+    %% Load Data
+    Params = Parameters(TestMode, TestSubject, TaskNumber, BlockChoice);
     DataFile = [ 'Data_Task' num2str(TaskNumber) ];
     load(DataFile);
-    if (TaskNumber == 1 )
-        load( 'Data_Intro' );
+    if (TaskNumber == 1 && BlockChoice == 'C')
+        load( 'Data_Intro1' );
     end
     
-    % Clear Storage Variables
+    %% Unpack The Param Struct to save on typing
+    %NumberOfBlocks = Task.TotalBlocks;
+    if (BlockChoice == 'C')
+        LBlocks = Task.CBlocks;
+    else
+        LBlocks = Task.PBlocks;
+    end
+    
+    
+    % Store the Variables for all trials (VAT) 
     VAT.TimeStamps = [];
-    VAT.TimeCodes = [];
-    VAT.KeyCodes = [];
-    VAT.RT = [];
-
-    % Delay for 1 Second
-    WaitSecs(1);
+    VAT.TScode     = [];
+    VAT.KeyCode    = [];
+    VAT.PresentationOrder = [];
 
 %%%%%%%%%%%%%%
 % BEGIN SCAN %
 %%%%%%%%%%%%%%
 %% Start Intro
-    if ( TaskNumber == 1 )
-        Text = 'Starting Intro ...';
-        DrawFormattedText(WSS, Text, 'center', 'center', 0 , 45);
-        Screen('Flip',WSS);
-
-        % Delay for 2 Seconds
-        WaitSecs(2); 
-        % Show Intro
-        IntroParadigm(Params, ScreenHandels, Intro);
+    WaitSecs(2); 
+    if ( TaskNumber == 1 && BlockChoice == 'C')
+        IntroParadigm(1, Params, ScreenHandels, Intro);
     end
     
+    %% Wait for the Scan to begin
+    Text = 'Waiting for MRI scan to begin...';
+    DrawFormattedText(WSS, Text, 'center', 'center', 0 , 45);
+    Screen('Flip',WSS);
+                        
+    while KbCheck(-1); end % clear keyboard queue
+    Scanning = 0;
+    while Scanning ~= 1
+        [keyIsDown, TimePt, keyCode] = KbCheck(-1);
+        if ( keyCode(TRKey1) | keyCode(TRKey2) | keyCode(TRKB) )
+            Scanning = 1; disp('Scan Has Begun');
+            VAT.TimeStamps = [VAT.TimeStamps, TimePt];
+            VAT.TScode     = [VAT.TScode, 1];
+            VAT.KeyCode    = [VAT.KeyCode, find(keyCode,1)];
+        end
+    end
+    
+    % Keep KbCheck for looking for the TR signals
+    olddisabledkeys = DisableKeysForKbCheck([KbName('T'),KbName('5')]); 
+
 %%%%%%%%%%%%%%%%%%%
 %% Run Experiment %
 %%%%%%%%%%%%%%%%%%%
     try % Start Try - Catch
+        %% Run The Display loop    
+        for i = LBlocks
+            disp(i)       
+            switch TaskNumber
+                case 1
+                    TrialVariables = ...
+                        Task1Paradigm(i, Params, ScreenHandels, Task);
+                case 2
+                    TrialVariables = ...
+                        Task2Paradigm(i, Params, ScreenHandels, Task);
+                case 3
+                    TrialVariables = ...
+                        Task3Paradigm(i, Params, ScreenHandels, Task);
+                case 4
+                    TrialVariables = ...
+                        Task4Paradigm(i, Params, ScreenHandels, Task);
+            end
 
-        %% Run Task
-        disp(TaskNumber)
-        switch TaskNumber
-            case 1
-                [VAT.TimeStamps  VAT.TimeCodes  VAT.KeyCodes VAT.RT] = ...
-                    Task1Paradigm(Params, ScreenHandels, LTask)
-            case 2
-                [VAT.TimeStamps  VAT.TimeCodes  VAT.KeyCodes VAT.RT] = ...
-                    Task2Paradigm(Params, ScreenHandels, LTask);
-            case 3
-                [VAT.TimeStamps  VAT.TimeCodes  VAT.KeyCodes VAT.RT] = ...
-                    Task3Paradigm(Params, ScreenHandels, LTask);
-            case 4
-                [VAT.TimeStamps  VAT.TimeCodes  VAT.KeyCodes VAT.RT] = ...
-                    Task4Paradigm(Params, ScreenHandels, LTask);
-        end
-
-        % Task End
-        % Draw Fixation Point
-        Screen('FillRect', WSS, 128, RSS);
-        Screen('DrawDots', WSS, [0, 0], 10, ...
-                255*[1 0 0 1], [RSS(3)/2 RSS(4)/2], 1);
-        Screen('DrawingFinished', WSS); 
-        Screen('Flip',WSS);
+            % Block Break
+            Screen('FillRect', WSS, 128, RSS);
+            Screen('DrawDots', WSS, [0, 0], 10, ...
+                    255*[1 0 0 1], [RSS(3)/2 RSS(4)/2], 1);
+            Screen('DrawingFinished', WSS); 
+            Screen('Flip',WSS);
+            WaitSecs(Task.Timing.BlockBreak);
         
+            VAT.TimeStamps = ...
+                [VAT.TimeStamps, TrialVariables.TimeStamps];
+            VAT.TScode     = ...
+                [VAT.TScode, TrialVariables.TScode];
+            VAT.KeyCode    = ...
+                [VAT.KeyCode, TrialVariables.KeyCodes];
+            VAT.PresentationOrder = ...
+               [VAT.PresentationOrder, TrialVariables.POrder];
+        end
         
 %%%%%%%%%%%%%       
 % SAVE DATA % 
 %%%%%%%%%%%%%
-
-        % If Not in TestMode
+        % End TimeStamps
+        VAT.TimeStamps = [VAT.TimeStamps, GetSecs];
+        VAT.TScode     = [VAT.TScode, -1];
+        VAT.KeyCode    = [VAT.KeyCode,-1];
         if TestMode == 0
+            % Vat.TimeStamp Remade for better read
+            Base = VAT.TimeStamps(1);
+            VAT.TimeSec = [];
+            for time = VAT.TimeStamps
+                VAT.TimeSec = [VAT.TimeSec, time - Base];
+            end
+            
             % Save Data
             save([Params.Data_DIR,Params.Filename,'.mat'], ...
                 'Params', 'VAT');
-
             % Write Excel Format
-            xlsVAT = [VAT.TimeStamps; VAT.TimeCodes; VAT.KeyCodes; VAT.RT];
-            xlswrite([Params.Data_DIR,Params.Filename, '.csv'], ...
+            xlsVAT = [VAT.TimeSec; VAT.TScode; VAT.KeyCode];
+            xlswrite([Params.Data_DIR,Params.Filename], ...
                 xlsVAT);
         end
             
@@ -221,65 +260,40 @@ while (~Escape)
 %%%%%%%%%%%%%%%%%%
 % FINISH/RESTART %
 %%%%%%%%%%%%%%%%%%
-    Text = 'Waiting for All Clear [p]';
-    DrawFormattedText(WSS, Text, 'center', 'center', 0 , 45);
-    Screen('Flip',WSS);
-
-    % Catch [p] key to move onto next stimulus
-    KeyEscape = false;
-    while ~KeyEscape
-        WaitSecs(0.01);
-        keyIsDown = 0;
-        [keyIsDown, secs, keyCode] = KbCheck(-1);
-        if ( keyIsDown == 1 ) & keyCode(OKKey)
-            KeyEscape = true;
-        end 
-    end %End Loop
-    
     %% Clear the Buffers
     olddisabledkeys = DisableKeysForKbCheck([]); 
-
-
 end % End Escape Error
-end % All Done, That's All she Wrote
+end % All Done, That's All He Wrote
 
-
-
-
-%%%%%%%%%%%%%%%%%%
-% Functions
-%%%%%%%%%%%%%%%%%%
-
-% GetCommand, Input Choices
-function [ TaskNumber ] = GetTaskNumber(WSS, RSS, SCenter) 
-    %% Set up the program, Ask for Task Number
+function [ TaskNumber BlockChoice ] = GetCommand(WSS, RSS, SCenter) 
+    %% Set up the program
     Escape = false;
     while (~Escape)
-        MSG = 'Task Number? [1-4] or [Q]  ==> ';
-        TaskNumber = GetEchoString(WSS, MSG, SCenter(1)/2, SCenter(2)/2);
+        MSG = 'What Task Number do you want to do? [1-4] or [Q]  ==> ';
+        TaskNumber = GetEchoString(WSS, MSG, SCenter(1), SCenter(2));
 
-        % Check if within range
-        if isstrprop(TaskNumber, 'digit')  
-            if  str2num(TaskNumber) > 4 || str2num(TaskNumber) < 1
-                disp('Not within Range, Exiting')
-            else
-                TaskNumber = str2num(TaskNumber);
-                Escape = true;
-            end
-        % If Exiting
+        if ~isnumeric(TaskNumber) || TaskNumber > 4 || TaskNumber < 1 
+        	eval error('Not within Range, Exiting')
         elseif (TaskNumber == 'q' || TaskNumber == 'Q')
             TaskNumber = 0;
+            BlockChoice = 'Q';
             return 
-        else
-            disp('Not within Range, Exiting')
-        end %End If isnumeric
-    end  %End While Escape
-end %End Function
+        end
+    end 
+    Escape = false;
+    while (~Escape)
+        %% Product or Comprehension
+        MSG = 'Comprehension or Production? [C or P or Q] ==> ';
+        TaskNumber = GetEchoString(WSS, MSG, 'center', 'center');
+        
+        if ~(BlockChoice == 'P' || BlockChoice == 'C' || BlockChoice == 'p' || ...
+                BlockChoice == 'c')
+            eval error('Need C or P')
+        elseif (BlockChoice == 'Q' || BlockChoice == 'q')
+            TaskNumber = 0;
+        end
+        BlockChoice = upper(BlockChoice);
+    end
+end 
 
-
-% Code to be used to later on diable the MRI TR trigger Keys
-% olddisabledkeys=DisableKeysForKbCheck([KbName('T'), KbName('5')])
-
-% Code to be used to later on restore the MRI TR trigger Keys
-% olddisabledkeys=DisableKeysForKbCheck([])
-
+%function [ RANGE ] GetFinishTaskNumber = ()

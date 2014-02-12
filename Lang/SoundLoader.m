@@ -1,5 +1,5 @@
-function [ SongList, SongFreq, Channel ] = SoundLoader( folder_path )
-% Images = SoundLoader(folder) ********************************
+function [ SongList, SongFreq, Channel ] = SoundLoader( folder, TaskNumber, Block )
+% Images = SoundLoader(folder, WB) ********************************
 %
 %	Description:
 %		Loads Sound into Memory
@@ -34,7 +34,11 @@ function [ SongList, SongFreq, Channel ] = SoundLoader( folder_path )
 
 
 %% Figure out all the files in the folder
-Files = dir ([folder_path, '/*' ]);
+if ( Block == 0 )
+    Files = dir ([folder, '/*']); 
+else    
+    Files = dir ([folder, '/', num2str(TaskNumber), num2str(Block),  '*' ]);
+end
 
 counter = 0;
 for i=1:size(Files,1)
@@ -44,10 +48,10 @@ for i=1:size(Files,1)
    
     if (strcmpi(ext, '.wav') == 1)
 
-	disp ( Files(i).name )
+		disp ( Files(i).name )
         counter = counter+1; 
         [ SongList{counter}, SongFreq{counter}, SongBits ] = ...
-            wavread([folder_path, '/', Files(i).name]); 
+            wavread([folder, '/', Files(i).name]); 
         Channel{counter} = size(SongList{counter}',1);
     end    
 end

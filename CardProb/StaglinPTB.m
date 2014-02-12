@@ -106,7 +106,7 @@ while Scanning ~= 1
             | keyCode(Keys.TRKB) )
         Scanning = 1; disp('Scan Has Begun');
         VAT.StartTime = TimePt;
-        VAT.TimeStamps(VAT.j) = 0;
+        VAT.TimeStamps(VAT.j) = TimePt;
         VAT.TSCodes{VAT.j} = 'Scan Start';
         VAT.j = VAT.j + 1;
     end

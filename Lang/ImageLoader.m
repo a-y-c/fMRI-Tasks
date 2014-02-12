@@ -1,5 +1,5 @@
-function [Images, ImageNames, ImageSize] = ImageLoader(folder_path)
-% Images = ImageLoader(folder_path) ********************************
+function [Images, ImageNames, ImageSize] = ImageLoader(folder,  TaskNumber, Block)
+% Images = ImageLoader(folder, WB) ********************************
 %
 %	Description:
 %		Loads Images into Memory
@@ -33,17 +33,23 @@ function [Images, ImageNames, ImageSize] = ImageLoader(folder_path)
 %
 %******************************************************************
 
+WB = 0;
 Images = {};
 ImageNames = {};
 ImageSize = {};
 
 %% Figure out all the files in the folder
-Files = dir ([folder_path, '/*']); 
-
-%% Wait Bar
-h = waitbar(0,{['Loading Images in Directory:']; [folder_path]});
-
+if ( Block == 0 ) 
+    Files = dir ([folder, '/*']); 
+else 
+    Files = dir ([folder, '/', num2str(TaskNumber), num2str(Block),  '*' ]);
+end
 %% Load the images
+
+if WB == 1
+    h = waitbar(0,{['Loading Images in Directory:']; [folder]});
+end
+
 counter = 0;
 for i=1:size(Files,1)
     
@@ -67,18 +73,23 @@ for i=1:size(Files,1)
         (strcmpi(ext, '.xwd') == 1) && ...
         (regexpi(name, '._') ~= 1 ))
 		
-         disp (Files(i).name)  
+         disp ( Files(i).name )  
          counter = counter+1;        
-         Images{counter} = imread([folder_path,'/',Files(i).name]);
+         Images{counter} = imread([folder,'/',Files(i).name]);
          ImageNames{counter} = Files(i).name;
          ImageSize{counter} = size(Images{counter});
+         %save(ImageNames)
     end
     
-    % Change the Waitbar
-    if mod(i,5) == 0
-        waitbar((i)/size(Files,1), h)
+    if WB == 1
+        % Change the Waitbar
+        if mod(i,5) == 0
+            waitbar((i)/size(Files,1), h)
+        end
     end
-end %For Loop
+    
+end
 
-close(h)
-end %Fuction
+if WB == 1
+    close(h)
+end

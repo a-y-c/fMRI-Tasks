@@ -57,6 +57,12 @@ Keys.BB2 = KbName('2');    % Button Box 2
 Keys.BB3 = KbName('3');    % Button Box 3
 Keys.BB4 = KbName('4');    % Button Box 4
 
+Keys.BBb = KbName('b');    % Button Box r
+Keys.BBy = KbName('y');    % Button Box g
+Keys.BBg = KbName('g');    % Button Box b
+Keys.BBr = KbName('r');    % Button Box y
+
+
 % Keep KbCheck for looking for the TR signals
 olddisabledkeys = DisableKeysForKbCheck([KbName('T'),KbName('5')]); 
 
@@ -444,16 +450,16 @@ function [ TStamp, KCode, RT ] = GetKeyPressWithTimeOut(Keys, maxTime)
         keyIsDown = 0;
         [keyIsDown, secs, keyCode] = KbCheck(-1);
         if ( keyIsDown == 1 )
-            if (keyCode(Keys.BB1) | keyCode(Keys.KB1))
+            if (keyCode(Keys.BB1) | keyCode(Keys.KB1) | keyCode(Keys.BBb))
                 KCode = 1;
                 Escape = true;
-            elseif (keyCode(Keys.BB2) | keyCode(Keys.KB2))
+            elseif (keyCode(Keys.BB2) | keyCode(Keys.KB2) | keyCode(Keys.BBy))
                 KCode = 2;
                 Escape = true;
-            elseif (keyCode(Keys.BB3) | keyCode(Keys.KB3))
+            elseif (keyCode(Keys.BB3) | keyCode(Keys.KB3) | keyCode(Keys.BBg))
                 KCode = 3;
                 Escape = true;
-            elseif (keyCode(Keys.BB4) | keyCode(Keys.KB4))
+            elseif (keyCode(Keys.BB4) | keyCode(Keys.KB4) | keyCode(Keys.BBr))
                 KCode = 4; 
                 Escape = true;
 

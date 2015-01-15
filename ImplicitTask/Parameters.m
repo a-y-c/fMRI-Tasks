@@ -23,13 +23,12 @@ function Params = Parameters(TestMode, TestSubject)
 %
 % Used By:
 %   StaglinPTB
-%
 %******************************************************************
 
 %%%%%%%%%
 % Setup %
 %%%%%%%%%
-Params.ExperimentName = 'fMRI_AlcoholImpTask';
+Params.ExperimentName = 'fMRI_MethImpTask';
 Params.TestSubject = TestSubject;
 
 % Design Choice
@@ -99,7 +98,7 @@ Params.Filename  = [ Params.ExperimentName, '_', ...
 % TIMING %
 %%%%%%%%%%
 Params.Timing.Intro = 10;
-Params.Timing.Intro = 2;
+Params.Timing.Intro = 1;
 Params.Timing.ResponseTime = 5;
 Params.Timing.ResponseTime = 2;
 Params.Timing.CorrectionTime = 5;
@@ -111,9 +110,9 @@ Params.Timing.CorrectionTime = 2;
 Params.Task = {}
 
 % Task 1
-Params.Task{1}.Intro = 'If the center word belongs to a category on the left, press the Leftmost Button. If the center word belongs to a category on the right, press the Rightmost Button. If you make an error, an X will appear - fix it by pressing the other key.'
+Params.Task{1}.Intro = 'If the center word belongs to a category on the left, press the Leftmost Button.\n\n If the center word belongs to a category on the right, press the Rightmost Button.\n\n If you make an error, an X will appear - fix it by pressing the other key.'
 Params.Task{1}.LeftWord = 'Soda';
-Params.Task{1}.RightWord = 'Methamphetamine';
+Params.Task{1}.RightWord = 'Meth';
 Params.Task{1}.LeftLeaningWord = {  'Coke'; 
                                     'Cassis'; 
                                     'Sinas';
@@ -129,7 +128,7 @@ Params.Task{1}.RightLeaningWord = { 'Crank';
                                     'Tina' };
                                     
 % Task 2
-Params.Task{2}.Intro = 'If the center word belongs to a category on the left, press the Leftmost Button. If the center word belongs to a category on the right, press the Rightmost Button. If you make an error, an X will appear - fix it by pressing the other key.'
+Params.Task{2}.Intro = 'If the center word belongs to a category on the left, press the Leftmost Button.\n\n If the center word belongs to a category on the right, press the Rightmost Button. \n\n If you make an error, an X will appear - fix it by pressing the other key.'
 Params.Task{2}.LeftWord = 'Positive';
 Params.Task{2}.RightWord = 'Negative';
 Params.Task{2}.LeftLeaningWord = {  'Sociable'; 
@@ -146,52 +145,91 @@ Params.Task{2}.RightLeaningWord = { 'Antisocial';
                                     'Obnoxious';
                                     'Tedious' };
 % Task 3 
-Params.Task{3}.Intro = 'If the center word belongs to a categories on the left, press the Leftmost Button. If the center word belongs to a categories on the right, press the Rightmost Button. If you make an error, an X will appear - fix it by pressing the other key'
+Params.Task{3}.Intro = 'If the center word belongs to a categories on the left, press the Leftmost Button. \n\n If the center word belongs to a categories on the right, press the Rightmost Button.\n\n If you make an error, an X will appear - fix it by pressing the other key'
 Params.Task{3}.LeftWord = 'Soda/Positive';
-Params.Task{3}.RightWord = 'Alcohol/Negative';
+Params.Task{3}.RightWord = 'Meth/Negative';
 Params.Task{3}.LeftLeaningWord = ...
-    [ Params.Task{1}.LeftLeaningWord; Params.Task{2}.LeftLeaningWord ];
+    [   Params.Task{1}.LeftLeaningWord(1); 
+        Params.Task{1}.LeftLeaningWord(2); 
+        Params.Task{1}.LeftLeaningWord(3); 
+        Params.Task{2}.LeftLeaningWord(1); 
+        Params.Task{2}.LeftLeaningWord(2); 
+        Params.Task{2}.LeftLeaningWord(3) ];
 Params.Task{3}.RightLeaningWord = ...
-    [ Params.Task{1}.RightLeaningWord; Params.Task{2}.RightLeaningWord ];
-
+    [   Params.Task{1}.RightLeaningWord(1); 
+        Params.Task{1}.RightLeaningWord(2); 
+        Params.Task{1}.RightLeaningWord(3); 
+        Params.Task{2}.RightLeaningWord(1); 
+        Params.Task{2}.RightLeaningWord(2); 
+        Params.Task{2}.RightLeaningWord(3) ];
 % Task 4 
 Params.Task{4}.Intro = 'Sort the same categories again.'
 Params.Task{4}.LeftWord = 'Soda/Positive';
-Params.Task{4}.RightWord = 'Alcohol/Negative';
+Params.Task{4}.RightWord = 'Meth/Negative';
 Params.Task{4}.LeftLeaningWord = ...
-    [ Params.Task{1}.LeftLeaningWord; Params.Task{2}.LeftLeaningWord ];
+    [   Params.Task{1}.LeftLeaningWord(4); 
+        Params.Task{1}.LeftLeaningWord(5); 
+        Params.Task{1}.LeftLeaningWord(6); 
+        Params.Task{2}.LeftLeaningWord(4); 
+        Params.Task{2}.LeftLeaningWord(5); 
+        Params.Task{2}.LeftLeaningWord(6) ];
 Params.Task{4}.RightLeaningWord = ...
-    [ Params.Task{1}.RightLeaningWord; Params.Task{2}.RightLeaningWord ];
-
+    [   Params.Task{1}.RightLeaningWord(4); 
+        Params.Task{1}.RightLeaningWord(5); 
+        Params.Task{1}.RightLeaningWord(6); 
+        Params.Task{2}.RightLeaningWord(4); 
+        Params.Task{2}.RightLeaningWord(5); 
+        Params.Task{2}.RightLeaningWord(6) ];
 % Task 5
-Params.Task{5}.Intro = 'If the center word belongs to a category on the left, press the Leftmost Button. If the center word belongs to a category on the right, press the Rightmost Button. If you make an error, an X will appear - fix it by pressing the other key.'
-Params.Task{5}.LeftWord = 'Alcohol';
+Params.Task{5}.Intro = 'If the center word belongs to a category on the left, press the Leftmost Button.\n\n If the center word belongs to a category on the right, press the Rightmost Button.\n\n If you make an error, an X will appear - fix it by pressing the other key.'
+Params.Task{5}.LeftWord = 'Meth';
 Params.Task{5}.RightWord = 'Soda';
 Params.Task{5}.LeftLeaningWord = Params.Task{1}.RightLeaningWord;
 Params.Task{5}.RightLeaningWord = Params.Task{1}.LeftLeaningWord;
 
 % Task 6
-Params.Task{6}.Intro = 'If the center word belongs to a category on the left, press the Leftmost Button. If the center word belongs to a category on the right, press the Rightmost Button. If you make an error, an X will appear - fix it by pressing the other key.'
+Params.Task{6}.Intro = 'If the center word belongs to a category on the left, press the Leftmost Button.\n\n If the center word belongs to a category on the right, press the Rightmost Button.\n\n If you make an error, an X will appear - fix it by pressing the other key.'
 Params.Task{6}.LeftWord = 'Negative';
 Params.Task{6}.RightWord = 'Postive';
 Params.Task{6}.LeftLeaningWord = Params.Task{2}.RightLeaningWord;
 Params.Task{6}.RightLeaningWord = Params.Task{2}.LeftLeaningWord;
 
 % Task 7 
-Params.Task{7}.Intro = 'The Categoies have new configuration. \nIf the center word belongs to a categories on the left, press the Leftmost Button. If the center word belongs to a categories on the right, press the Rightmost Button. If you make an error, an X will appear - fix it by pressing the other key'
-Params.Task{7}.LeftWord = 'Alcohol/Positive';
+Params.Task{7}.Intro = 'The Categoies have new configuration.\n\n If the center word belongs to a categories on the left, press the Leftmost Button.\n\n If the center word belongs to a categories on the right, press the Rightmost Button.\n\n If you make an error, an X will appear - fix it by pressing the other key'
+Params.Task{7}.LeftWord = 'Meth/Positive';
 Params.Task{7}.RightWord = 'Soda/Negative';
 Params.Task{7}.LeftLeaningWord = ...
-    [ Params.Task{1}.RightLeaningWord; Params.Task{2}.LeftLeaningWord ];
+    [   Params.Task{2}.LeftLeaningWord(1); 
+        Params.Task{2}.LeftLeaningWord(2); 
+        Params.Task{2}.LeftLeaningWord(3); 
+        Params.Task{1}.RightLeaningWord(1); 
+        Params.Task{1}.RightLeaningWord(2); 
+        Params.Task{1}.RightLeaningWord(3) ];
 Params.Task{7}.RightLeaningWord = ...
-    [ Params.Task{1}.LeftLeaningWord; Params.Task{2}.RightLeaningWord ];
+    [   Params.Task{2}.RightLeaningWord(1); 
+        Params.Task{2}.RightLeaningWord(2); 
+        Params.Task{2}.RightLeaningWord(3); 
+        Params.Task{1}.LeftLeaningWord(1); 
+        Params.Task{1}.LeftLeaningWord(2); 
+        Params.Task{1}.LeftLeaningWord(3) ];
 
 % Task 8 
 Params.Task{8}.Intro = 'Sort the same categories again.'
-Params.Task{8}.LeftWord = 'Alcohol/Positive';
+Params.Task{8}.LeftWord = 'Meth/Positive';
 Params.Task{8}.RightWord = 'Soda/Negative';
 Params.Task{8}.LeftLeaningWord = ...
-    [ Params.Task{1}.RightLeaningWord; Params.Task{2}.LeftLeaningWord ];
+    [   Params.Task{2}.LeftLeaningWord(1); 
+        Params.Task{2}.LeftLeaningWord(2); 
+        Params.Task{2}.LeftLeaningWord(3); 
+        Params.Task{1}.RightLeaningWord(1); 
+        Params.Task{1}.RightLeaningWord(2); 
+        Params.Task{1}.RightLeaningWord(3) ];
 Params.Task{8}.RightLeaningWord = ...
-    [ Params.Task{1}.LeftLeaningWord; Params.Task{2}.RightLeaningWord ];
+    [   Params.Task{2}.RightLeaningWord(1); 
+        Params.Task{2}.RightLeaningWord(2); 
+        Params.Task{2}.RightLeaningWord(3); 
+        Params.Task{1}.LeftLeaningWord(1); 
+        Params.Task{1}.LeftLeaningWord(2); 
+        Params.Task{1}.LeftLeaningWord(3) ];
+
 

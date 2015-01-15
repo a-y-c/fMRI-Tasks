@@ -65,17 +65,20 @@ ifiS = ScreenHandels.ifiS; % interframe interval Subject
 %%%%%%%%%
 % SETUP %
 %%%%%%%%%
+
 Task = Params.Task{BlockNum};
 Timing = Params.Timing;
-RED =  [ 255 0 0 ];
+RED = [ 255 0 0 ];
 
 % Presentation Order (Randomized)
 TotalWords = [ Task.LeftLeaningWord; Task.RightLeaningWord ];
-LeftRightDif = [ zeros(length(Task.LeftLeaningWord) ; ones(length(Task.RightLeaningWord) ];
+LeftRightDif = [    zeros(length(Task.LeftLeaningWord),1) ; 
+                    ones(length(Task.RightLeaningWord),1) ];
 ix = randperm(length(TotalWords));
 
-LeftTextPos = Params.ScreenCenter / 2;
+LeftTextPos = [ Params.ScreenCenter(1)/2 Params.ScreenCenter(2)/2 ];
 RightTextPos = [ Params.ScreenCenter(1)*3/2 Params.ScreenCenter(2)/2 ];
+UnderCenterPos = [ Params.ScreenCenter(1) Params.ScreenCenter(2)*3/2 ]; 
 
 %% Preallocate Variable for Speed
 VAT.TimeStamps = nan(1, 100);
@@ -112,19 +115,23 @@ for n = 1:length(TotalWords)
     RightText = Task.RightWord;
 
     CenterText = TotalWords{ix(n)};
+    TextWidthLeft = Screen('TextBounds',WSS, LeftText);
+    TLeftTextPos = LeftTextPos(1) - TextWidthLeft(3)/2;
+    TextWidthRight = Screen('TextBounds', WSS, RightText);
+    TRightTextPos = RightTextPos(1) - TextWidthRight(3)/2;
     DrawFormattedText(WSS, CenterText, 'center', 'center', 0 , 45);
-    DrawFormattedText(WSS, LeftText, LeftTextPos(1), LeftTextPos(2), 0 , 45);
-    DrawFormattedText(WSS, RightText, RightTextPos(1), RightTextPos(2), 0 , 45);
+    DrawFormattedText(WSS, LeftText, TLeftTextPos, LeftTextPos(2), 0 , 45);
+    DrawFormattedText(WSS, RightText, TRightTextPos, RightTextPos(2), 0 , 45);
 
     % Flip Screen
-    TimeStamp = Screen('Flip',WSS);
+    TimeStamp = Screen('Flip', WSS, [], 1);
     
     % Get Key Press 
     [ RT, Response ] = GetKeyPressWithTimeOut(Keys, Timing.ResponseTime);
 
     % If not the Correct Choice
     WrongChoice = false;
-    if (LeftRightDif{ix(n)} == 1)
+    if (LeftRightDif(ix(n)) == 0)
         if (Response == 3) || (Response == 4)
             WrongChoice = true;
             Expected1 = 1;
@@ -141,9 +148,16 @@ for n = 1:length(TotalWords)
     
     baseTime = GetSecs;
     maxTime = Timing.CorrectionTime;
+    CorrectTime = 0;
+
+    % Display X
+    if (WrongChoice)
+        DrawFormattedText(WSS, 'X', UnderCenterPos(1) , UnderCenterPos(2), RED, 45);
+        CorrectTime = Screen('Flip', WSS );
+    end
+
+    % Wait for Wrong Choice Correction
     while (WrongChoice)
-        DrawFormattedText(WSS, 'X', XT1, YT1, RED, 45);
-        CorrectTime = Screen('Flip', WSS, [], 1) 
         
         newRT = 0;
         ResponseFix = 0;
@@ -151,18 +165,23 @@ for n = 1:length(TotalWords)
 
         if (ResponseFix == Expected1 || ResponseFix == Expected2)
             WrongChoice = false;
+        end
             
         % If Time ran out 
         maxTime = maxTime - (GetSecs - baseTime);
-        if ( maxTime > 0 )
+        if ( maxTime < 0 )
             WrongChoice = false;
+        end
     end
+
+    % Flip for Nothing
+     Screen('Flip', WSS);
 
     % Store Record
     VAT.TimeStamps(VATCount)       = TimeStamp;
     VAT.ResponseChoice(VATCount)   = Response; 
     VAT.ResponseTime(VATCount)     = RT;
-    VAT.CorrectTime(VATCount)      = CorrectTime;
+    VAT.CorrectTime(VATCount)      = maxTime;
     VAT.BlockNum(VATCount)         = BlockNum;
     VATCount = VATCount + 1;
     
@@ -222,17 +241,16 @@ function [ RT, Response ] = GetKeyPressWithTimeOut(Keys, maxTime)
 
     % Format Output to be Read. Only Button Box
     if keyCode(Keys.KB1) || keyCode(Keys.BB1)
-        Response = '1';
+        Response = 1;
     elseif keyCode(Keys.KB2) || keyCode(Keys.BB2)
-        Response = '2';
+        Response = 2;
     elseif keyCode(Keys.KB3) || keyCode(Keys.BB3)
-        Response = '3';
+        Response = 3;
     elseif keyCode(Keys.KB4) || keyCode(Keys.BB4)
-        Response = '4';
+        Response = 4;
     else
-        Response = '0';
+        Response = 0;
     end
 
     RT = secs-baseTime;
 end
-
